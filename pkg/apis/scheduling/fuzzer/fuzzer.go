@@ -33,5 +33,15 @@ var Funcs = func(codecs runtimeserializer.CodecFactory) []interface{} {
 				s.PreemptionPolicy = &preemptLowerPriority
 			}
 		},
+		func(p *scheduling.PodGroupPolicy, c randfill.Continue) {
+			c.FillNoCustom(p)
+
+			if p.Kind == "" {
+				p.Kind = []scheduling.PodGroupPolicyKind{
+					scheduling.PodGroupPolicyKindDefault,
+					scheduling.PodGroupPolicyKindGang,
+				}[c.Int31n(2)]
+			}
+		},
 	}
 }
