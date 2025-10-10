@@ -29450,13 +29450,13 @@ func TestValidateContainerStateTransition(t *testing.T) {
 func TestValidateWorkload(t *testing.T) {
 	successCases := map[string]*core.Pod{
 		"correct": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 "workload",
-			PodGroup:             "group",
+			Name:               "workload",
+			PodGroup:           "group",
 			PodGroupReplicaKey: "replica",
 		})),
 		"no replica key": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 "workload",
-			PodGroup:             "group",
+			Name:               "workload",
+			PodGroup:           "group",
 			PodGroupReplicaKey: "",
 		})),
 	}
@@ -29469,28 +29469,28 @@ func TestValidateWorkload(t *testing.T) {
 
 	failureCases := map[string]*core.Pod{
 		"empty workload name": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 "",
-			PodGroup:             "group",
+			Name:               "",
+			PodGroup:           "group",
 			PodGroupReplicaKey: "replica",
 		})),
 		"incorrect workload name": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 ".workload",
-			PodGroup:             "group",
+			Name:               ".workload",
+			PodGroup:           "group",
 			PodGroupReplicaKey: "replica",
 		})),
 		"empty pod group": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 "workload",
-			PodGroup:             "",
+			Name:               "workload",
+			PodGroup:           "",
 			PodGroupReplicaKey: "replica",
 		})),
 		"incorrect pod group": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 "workload",
-			PodGroup:             ".group",
+			Name:               "workload",
+			PodGroup:           ".group",
 			PodGroupReplicaKey: "replica",
 		})),
 		"incorrect replica key": podtest.MakePod("", podtest.SetWorkload(&core.WorkloadReference{
-			Name:                 "workload",
-			PodGroup:             "group",
+			Name:               "workload",
+			PodGroup:           "group",
 			PodGroupReplicaKey: ".replica",
 		})),
 	}
