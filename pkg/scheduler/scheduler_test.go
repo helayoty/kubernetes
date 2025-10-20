@@ -47,6 +47,7 @@ import (
 	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 	fwk "k8s.io/kube-scheduler/framework"
+	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/names"
 	testingclock "k8s.io/utils/clock/testing"
 	"k8s.io/utils/ptr"
 
@@ -691,6 +692,9 @@ func Test_buildQueueingHintMap(t *testing.T) {
 				{Resource: fwk.DeviceClass, ActionType: fwk.All}: {
 					{PluginName: filterWithoutEnqueueExtensions, QueueingHintFn: defaultQueueingHintFn},
 				},
+				{Resource: fwk.Workload, ActionType: fwk.All}: {
+					{PluginName: filterWithoutEnqueueExtensions, QueueingHintFn: defaultQueueingHintFn},
+				},
 			},
 		},
 		{
@@ -834,6 +838,7 @@ func Test_UnionedGVKs(t *testing.T) {
 		enableInPlacePodVerticalScaling bool
 		enableSchedulerQueueingHints    bool
 		enableDynamicResourceAllocation bool
+		enableGangScheduling            bool
 	}{
 		{
 			name: "filter without EnqueueExtensions plugin",
@@ -856,6 +861,7 @@ func Test_UnionedGVKs(t *testing.T) {
 				fwk.StorageClass:          fwk.All,
 				fwk.ResourceClaim:         fwk.All,
 				fwk.DeviceClass:           fwk.All,
+				fwk.Workload:              fwk.All,
 			},
 		},
 		{
@@ -1001,6 +1007,24 @@ func Test_UnionedGVKs(t *testing.T) {
 			enableDynamicResourceAllocation: true,
 			enableSchedulerQueueingHints:    true,
 		},
+		{
+			name:    "plugins with default profile and GangScheduling",
+			plugins: schedulerapi.PluginSet{Enabled: append(defaults.PluginsV1.MultiPoint.Enabled, schedulerapi.Plugin{Name: names.GangScheduling})},
+			want: map[fwk.EventResource]fwk.ActionType{
+				fwk.Pod:                   fwk.Add | fwk.UpdatePodLabel | fwk.UpdatePodToleration | fwk.UpdatePodSchedulingGatesEliminated | fwk.Delete,
+				fwk.Node:                  fwk.Add | fwk.UpdateNodeAllocatable | fwk.UpdateNodeLabel | fwk.UpdateNodeTaint | fwk.Delete,
+				fwk.CSINode:               fwk.All - fwk.Delete,
+				fwk.CSIDriver:             fwk.Update,
+				fwk.CSIStorageCapacity:    fwk.All - fwk.Delete,
+				fwk.PersistentVolume:      fwk.All - fwk.Delete,
+				fwk.PersistentVolumeClaim: fwk.All - fwk.Delete,
+				fwk.StorageClass:          fwk.All - fwk.Delete,
+				fwk.VolumeAttachment:      fwk.Delete,
+				fwk.Workload:              fwk.All - fwk.Delete,
+			},
+			enableGangScheduling:         true,
+			enableSchedulerQueueingHints: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1027,6 +1051,11 @@ func Test_UnionedGVKs(t *testing.T) {
 						break
 					}
 				}
+			} else {
+				featuregatetesting.SetFeatureGatesDuringTest(t, utilfeature.DefaultFeatureGate, featuregatetesting.FeatureOverrides{
+					features.GenericWorkload: tt.enableGangScheduling,
+					features.GangScheduling:  tt.enableGangScheduling,
+				})
 			}
 
 			_, ctx := ktesting.NewTestContext(t)

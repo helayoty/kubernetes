@@ -133,7 +133,14 @@ func (sched *Scheduler) addPodToSchedulingQueue(obj interface{}) {
 	logger := sched.logger
 	pod := obj.(*v1.Pod)
 	logger.V(3).Info("Add event for unscheduled pod", "pod", klog.KObj(pod))
+	if sched.WorkloadManager != nil {
+		// Register pod into workload manager before adding to the scheduling queue.
+		sched.WorkloadManager.AddPod(pod)
+	}
 	sched.SchedulingQueue.Add(logger, pod)
+	if utilfeature.DefaultFeatureGate.Enabled(features.GangScheduling) {
+		sched.SchedulingQueue.MoveAllToActiveOrBackoffQueue(logger, framework.EventUnscheduledPodAdd, nil, pod, nil)
+	}
 }
 
 func (sched *Scheduler) syncPodWithDispatcher(pod *v1.Pod) *v1.Pod {
@@ -218,6 +225,11 @@ func (sched *Scheduler) deletePodFromSchedulingQueue(obj interface{}) {
 
 	logger.V(3).Info("Delete event for unscheduled pod", "pod", klog.KObj(pod))
 	sched.SchedulingQueue.Delete(pod)
+	if sched.WorkloadManager != nil {
+		// Delete pod from workload manager after deleting the pod from scheduling queue.
+		sched.WorkloadManager.DeletePod(pod)
+	}
+
 	fwk, err := sched.frameworkForPod(pod)
 	if err != nil {
 		// This shouldn't happen, because we only accept for scheduling the pods
@@ -258,6 +270,10 @@ func (sched *Scheduler) addPodToCache(obj interface{}) {
 	}
 
 	logger.V(3).Info("Add event for scheduled pod", "pod", klog.KObj(pod))
+	if sched.WorkloadManager != nil {
+		// Register pod into workload manager before adding to the cache.
+		sched.WorkloadManager.AddPod(pod)
+	}
 	if err := sched.Cache.AddPod(logger, pod); err != nil {
 		utilruntime.HandleErrorWithLogger(logger, err, "Scheduler cache AddPod failed", "pod", klog.KObj(pod))
 	}
@@ -355,6 +371,10 @@ func (sched *Scheduler) deletePodFromCache(obj interface{}) {
 	logger.V(3).Info("Delete event for scheduled pod", "pod", klog.KObj(pod))
 	if err := sched.Cache.RemovePod(logger, pod); err != nil {
 		utilruntime.HandleErrorWithLogger(logger, err, "Scheduler cache RemovePod failed", "pod", klog.KObj(pod))
+	}
+	if sched.WorkloadManager != nil {
+		// Delete pod from workload manager after deleting the pod from cache.
+		sched.WorkloadManager.DeletePod(pod)
 	}
 
 	sched.SchedulingQueue.MoveAllToActiveOrBackoffQueue(logger, framework.EventAssignedPodDelete, pod, nil, nil)
@@ -616,6 +636,15 @@ func addAllEventHandlers(
 				return err
 			}
 			handlers = append(handlers, handlerRegistration)
+		case fwk.Workload:
+			if utilfeature.DefaultFeatureGate.Enabled(features.GenericWorkload) {
+				if handlerRegistration, err = informerFactory.Scheduling().V1alpha1().Workloads().Informer().AddEventHandler(
+					buildEvtResHandler(at, fwk.Workload),
+				); err != nil {
+					return err
+				}
+				handlers = append(handlers, handlerRegistration)
+			}
 		default:
 			// Tests may not instantiate dynInformerFactory.
 			if dynInformerFactory == nil {
