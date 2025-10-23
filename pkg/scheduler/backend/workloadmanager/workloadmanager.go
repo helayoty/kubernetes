@@ -71,12 +71,7 @@ func (wm *workloadManager) AddPod(pod *v1.Pod) {
 		info = newPodGroupInfo()
 		wm.podGroupInfos[key] = info
 	}
-	info.allPods.Insert(pod.UID)
-	if pod.Spec.NodeName != "" {
-		info.scheduledPods.Insert(pod.UID)
-		// Clear pod from assumed when it is scheduled.
-		info.assumedPods.Delete(pod.UID)
-	}
+	info.addPod(pod)
 }
 
 // DeletePod removes a pod from the workload manager if it has a workload reference.
@@ -100,12 +95,9 @@ func (wm *workloadManager) DeletePod(pod *v1.Pod) {
 		// that splits Pod/Update into two separate Pod/Delete and Pod/Add events.
 		return
 	}
-	info.allPods.Delete(pod.UID)
-	info.assumedPods.Delete(pod.UID)
-	info.scheduledPods.Delete(pod.UID)
-
+	empty := info.deletePod(pod.UID)
 	// Clean up the map entry if no pods are left in the group.
-	if len(info.allPods) == 0 {
+	if empty {
 		delete(wm.podGroupInfos, key)
 	}
 }

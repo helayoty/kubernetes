@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/klog/v2"
 	"k8s.io/klog/v2/ktesting"
 	fwk "k8s.io/kube-scheduler/framework"
 	"k8s.io/kubernetes/pkg/scheduler/backend/workloadmanager"
@@ -183,12 +184,22 @@ func Test_isSchedulableAfterWorkloadChange(t *testing.T) {
 			}
 			actualHint, err := p.(*GangScheduling).isSchedulableAfterWorkloadChange(logger, tc.pod, tc.oldWorkload, tc.newWorkload)
 			if err != nil {
-				t.Errorf("unexpected error: %v", err)
+				t.Errorf("Unexpected error: %v", err)
 			}
 			if diff := cmp.Diff(tc.expectedHint, actualHint); diff != "" {
 				t.Errorf("Expected QueuingHint doesn't match (-want,+got):\n%s", diff)
 			}
 		})
+	}
+}
+
+type podActivatorMock struct {
+	activatedPods []*v1.Pod
+}
+
+func (pam *podActivatorMock) Activate(_ klog.Logger, pods map[string]*v1.Pod) {
+	for _, pod := range pods {
+		pam.activatedPods = append(pam.activatedPods, pod)
 	}
 }
 
@@ -226,6 +237,7 @@ func TestGangSchedulingFlow(t *testing.T) {
 		podsWaitingOnPermit  []*v1.Pod
 		wantPreEnqueueStatus *fwk.Status
 		wantPermitStatus     *fwk.Status
+		wantActivatedPods    []*v1.Pod
 		wantAllowedPods      []types.UID
 	}{
 		{
@@ -263,6 +275,7 @@ func TestGangSchedulingFlow(t *testing.T) {
 			initialWorkloads:     []*schedulingapi.Workload{workload},
 			podsWaitingOnPermit:  []*v1.Pod{p2, p4, p5},
 			wantPreEnqueueStatus: nil,
+			wantActivatedPods:    []*v1.Pod{p3},
 			// At Permit, p1 will be assumed, but the count (2) is less than the quorum (3), so it must wait.
 			wantPermitStatus: fwk.NewStatus(fwk.Wait, "waiting for minCount pods from a gang to be waiting on permit"),
 		},
@@ -289,10 +302,13 @@ func TestGangSchedulingFlow(t *testing.T) {
 			informerFactory := informers.NewSharedInformerFactory(fake.NewClientset(), 0)
 			workloadInformer := informerFactory.Scheduling().V1alpha1().Workloads()
 
+			fakeActivator := &podActivatorMock{}
+
 			fh, err := frameworkruntime.NewFramework(ctx, nil, nil,
 				frameworkruntime.WithInformerFactory(informerFactory),
 				frameworkruntime.WithWorkloadManager(manager),
 				frameworkruntime.WithWaitingPods(frameworkruntime.NewWaitingPodsMap()),
+				frameworkruntime.WithPodActivator(fakeActivator),
 			)
 			if err != nil {
 				t.Fatalf("Failed to create framework: %v", err)
@@ -342,6 +358,10 @@ func TestGangSchedulingFlow(t *testing.T) {
 			if !status.IsSuccess() {
 				t.Fatalf("Unexpected Reserve status: %v", status)
 			}
+
+			// Clear activated pods to assert those activated in tt.pod Permit.
+			fakeActivator.activatedPods = nil
+
 			gotPermitStatus, _ := pl.Permit(ctx, nil, tt.pod, "some-node")
 			if diff := cmp.Diff(tt.wantPermitStatus, gotPermitStatus); diff != "" {
 				t.Fatalf("Unexpected Permit status (-want, +got):\n%s", diff)
@@ -352,6 +372,9 @@ func TestGangSchedulingFlow(t *testing.T) {
 				return
 			}
 
+			if diff := cmp.Diff(tt.wantActivatedPods, fakeActivator.activatedPods); diff != "" {
+				t.Errorf("Unexpected activated pods (-want, +got):\n%s", diff)
+			}
 			for _, p := range tt.wantAllowedPods {
 				if wp := fh.GetWaitingPod(p); wp != nil {
 					t.Errorf("Expected pod %q to be allowed", p)

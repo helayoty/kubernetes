@@ -35,7 +35,7 @@ type podGroupKey struct {
 	namespace    string
 	workloadName string
 	podGroupName string
-	replicaKey string
+	replicaKey   string
 }
 
 func newPodGroupKey(namespace string, workloadRef *v1.WorkloadReference) podGroupKey {
@@ -43,7 +43,7 @@ func newPodGroupKey(namespace string, workloadRef *v1.WorkloadReference) podGrou
 		namespace:    namespace,
 		workloadName: workloadRef.Name,
 		podGroupName: workloadRef.PodGroup,
-		replicaKey: workloadRef.PodGroupReplicaKey,
+		replicaKey:   workloadRef.PodGroupReplicaKey,
 	}
 }
 
@@ -51,7 +51,10 @@ func newPodGroupKey(namespace string, workloadRef *v1.WorkloadReference) podGrou
 type podGroupInfo struct {
 	lock sync.RWMutex
 	// allPods tracks all pods belonging to the group that are known to the scheduler.
-	allPods sets.Set[types.UID]
+	allPods map[types.UID]*v1.Pod
+	// unscheduledPods tracks all pods that are unscheduled for this group,
+	// i.e., are neither assumed nor scheduled.
+	unscheduledPods sets.Set[types.UID]
 	// assumedPods tracks pods that have reached the Reserve stage and are waiting
 	// for the rest of the gang to arrive before being allowed to bind.
 	assumedPods sets.Set[types.UID]
@@ -64,10 +67,42 @@ type podGroupInfo struct {
 
 func newPodGroupInfo() *podGroupInfo {
 	return &podGroupInfo{
-		allPods:       sets.New[types.UID](),
-		assumedPods:   sets.New[types.UID](),
-		scheduledPods: sets.New[types.UID](),
+		allPods:         make(map[types.UID]*v1.Pod),
+		unscheduledPods: sets.New[types.UID](),
+		assumedPods:     sets.New[types.UID](),
+		scheduledPods:   sets.New[types.UID](),
 	}
+}
+
+// addPod adds the pod to this group.
+// Depending on the NodeName, it can insert the pod to scheduledPods set.
+func (pgs *podGroupInfo) addPod(pod *v1.Pod) {
+	pgs.lock.RLock()
+	defer pgs.lock.RUnlock()
+
+	pgs.allPods[pod.UID] = pod
+	if pod.Spec.NodeName != "" {
+		pgs.scheduledPods.Insert(pod.UID)
+		// Clear pod from unscheduled and assumed when it is scheduled.
+		pgs.unscheduledPods.Delete(pod.UID)
+		pgs.assumedPods.Delete(pod.UID)
+	} else {
+		pgs.unscheduledPods.Insert(pod.UID)
+	}
+}
+
+// deletePod completely deletes the pod from this group.
+// It returns true when the group is empty after removal.
+func (pgs *podGroupInfo) deletePod(podUID types.UID) bool {
+	pgs.lock.RLock()
+	defer pgs.lock.RUnlock()
+
+	delete(pgs.allPods, podUID)
+	pgs.unscheduledPods.Delete(podUID)
+	pgs.assumedPods.Delete(podUID)
+	pgs.scheduledPods.Delete(podUID)
+
+	return len(pgs.allPods) == 0
 }
 
 // AllPods returns the UIDs of all pods known to the scheduler for this group.
@@ -75,7 +110,22 @@ func (pgs *podGroupInfo) AllPods() sets.Set[types.UID] {
 	pgs.lock.RLock()
 	defer pgs.lock.RUnlock()
 
-	return pgs.allPods.Clone()
+	return sets.KeySet(pgs.allPods)
+}
+
+// UnscheduledPods returns all pods that are unscheduled for this group,
+// i.e., are neither assumed nor scheduled.
+// The returned map type corresponds to the argument of the PodActivator.Activate method.
+func (pgs *podGroupInfo) UnscheduledPods() map[string]*v1.Pod {
+	pgs.lock.RLock()
+	defer pgs.lock.RUnlock()
+
+	unscheduledPods := make(map[string]*v1.Pod, len(pgs.unscheduledPods))
+	for podUID := range pgs.unscheduledPods {
+		pod := pgs.allPods[podUID]
+		unscheduledPods[pod.Name] = pod
+	}
+	return unscheduledPods
 }
 
 // AssumedPods returns the UIDs of all pods for this group in the assumed state,
@@ -115,6 +165,7 @@ func (pgs *podGroupInfo) AssumePod(podUID types.UID) {
 	defer pgs.lock.Unlock()
 
 	pgs.assumedPods.Insert(podUID)
+	pgs.unscheduledPods.Delete(podUID)
 }
 
 // ForgetPod removes a pod from the assumed state.
@@ -122,5 +173,6 @@ func (pgs *podGroupInfo) ForgetPod(podUID types.UID) {
 	pgs.lock.Lock()
 	defer pgs.lock.Unlock()
 
+	pgs.unscheduledPods.Insert(podUID)
 	pgs.assumedPods.Delete(podUID)
 }

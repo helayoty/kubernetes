@@ -40,16 +40,18 @@ func TestWorkloadManager_AddPod(t *testing.T) {
 		initPodsToAssume []*v1.Pod
 		podToAdd         *v1.Pod
 
-		expectedPodGroups     int
-		expectInAllPods       bool
-		expectInAssumedPods   bool
-		expectInScheduledPods bool
+		expectedPodGroups       int
+		expectInAllPods         bool
+		expectInUnscheduledPods bool
+		expectInAssumedPods     bool
+		expectInScheduledPods   bool
 	}{
 		{
-			name:              "adding an unscheduled pod",
-			podToAdd:          p1,
-			expectedPodGroups: 1,
-			expectInAllPods:   true,
+			name:                    "adding an unscheduled pod",
+			podToAdd:                p1,
+			expectedPodGroups:       1,
+			expectInAllPods:         true,
+			expectInUnscheduledPods: true,
 		},
 		{
 			name:                  "adding a scheduled pod",
@@ -68,11 +70,12 @@ func TestWorkloadManager_AddPod(t *testing.T) {
 			expectInScheduledPods: true,
 		},
 		{
-			name:              "adding pod with different namespace",
-			initPods:          []*v1.Pod{p1},
-			podToAdd:          p3,
-			expectedPodGroups: 2,
-			expectInAllPods:   true,
+			name:                    "adding pod with different namespace",
+			initPods:                []*v1.Pod{p1},
+			podToAdd:                p3,
+			expectedPodGroups:       2,
+			expectInAllPods:         true,
+			expectInUnscheduledPods: true,
 		},
 		{
 			name:              "adding non-workload pod is a no-op",

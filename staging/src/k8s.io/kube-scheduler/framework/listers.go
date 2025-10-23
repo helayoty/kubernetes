@@ -132,6 +132,10 @@ type WorkloadManager interface {
 type PodGroupInfo interface {
 	// AllPods returns the UIDs of all pods known to the scheduler for this group.
 	AllPods() sets.Set[types.UID]
+	// UnscheduledPods returns all pods that are unscheduled for this group,
+	// i.e., are neither assumed nor scheduled.
+	// The returned map type corresponds to the argument of the PodActivator.Activate method.
+	UnscheduledPods() map[string]*v1.Pod
 	// AssumedPods returns the UIDs of all pods for this group in the "assumed" state,
 	// i.e., passed the Reserve gate.
 	AssumedPods() sets.Set[types.UID]

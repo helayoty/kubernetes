@@ -269,7 +269,10 @@ func (pl *GangScheduling) Permit(ctx context.Context, state fwk.CycleState, pod 
 	assumedPods := podGroupInfo.AssumedPods()
 	assumedOrScheduledPods := assumedPods.Union(podGroupInfo.ScheduledPods())
 	if len(assumedOrScheduledPods) < int(policy.Gang.MinCount) {
-		logger.V(4).Info("Quorum is not met for a gang. Waiting for another pod to allow", "pod", klog.KObj(pod), "workloadRef", pod.Spec.Workload)
+		// Activate unscheduled pods from this pod group in case they were waiting for this pod to be scheduled.
+		unscheduledPods := podGroupInfo.UnscheduledPods()
+		pl.handle.Activate(klog.FromContext(ctx), unscheduledPods)
+		logger.V(4).Info("Quorum is not met for a gang. Waiting for another pod to allow", "pod", klog.KObj(pod), "workloadRef", pod.Spec.Workload, "activatedPods", len(unscheduledPods))
 		return fwk.NewStatus(fwk.Wait, "waiting for minCount pods from a gang to be waiting on permit"), podGroupInfo.SchedulingTimeout()
 	}
 
