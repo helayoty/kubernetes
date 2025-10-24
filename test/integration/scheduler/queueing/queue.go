@@ -2517,6 +2517,85 @@ var CoreResourceEnqueueTestCases = []*CoreResourceEnqueueTestCase{
 		EnableSchedulingQueueHint: sets.New(true),
 		EnableGangScheduling:      true,
 	},
+	{
+		Name:          "Pod with non-existent workload remains blocked at PreEnqueue",
+		EnablePlugins: []string{names.GangScheduling},
+		InitialNodes: []*v1.Node{
+			st.MakeNode().Name("fake-node1").Obj(),
+		},
+		Pods: []*v1.Pod{
+			st.MakePod().Name("pod1").Container("image").Workload(&v1.WorkloadReference{Name: "nonexistent", PodGroup: "workers"}).Obj(),
+		},
+		TriggerFn: func(testCtx *testutils.TestContext) (map[fwk.ClusterEvent]uint64, error) {
+			return map[fwk.ClusterEvent]uint64{}, nil
+		},
+		WaitingInUnschedulable:    true,
+		WantRequeuedPods:          sets.Set[string]{},
+		EnableSchedulingQueueHint: sets.New(true),
+		EnableGangScheduling:      true,
+	},
+	{
+		Name:          "Pods in gang remain unscheduled when cluster has insufficient capacity for all pods",
+		EnablePlugins: []string{names.GangScheduling},
+		InitialNodes: []*v1.Node{
+			st.MakeNode().Name("fake-node1").Capacity(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).Obj(),
+			st.MakeNode().Name("fake-node2").Capacity(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).Obj(),
+		},
+		InitialWorkloads: []*schedulingapi.Workload{
+			st.MakeWorkload().Name("w1").PodGroup(st.MakePodGroup().Name("pg1").MinCount(3).Obj()).Obj(),
+		},
+		Pods: []*v1.Pod{
+			st.MakePod().Name("pod1").Container("image").
+				Req(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).
+				Workload(&v1.WorkloadReference{Name: "w1", PodGroup: "pg1"}).Obj(),
+			st.MakePod().Name("pod2").Container("image").
+				Req(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).
+				Workload(&v1.WorkloadReference{Name: "w1", PodGroup: "pg1"}).Obj(),
+			st.MakePod().Name("pod3").Container("image").
+				Req(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).
+				Workload(&v1.WorkloadReference{Name: "w1", PodGroup: "pg1"}).Obj(),
+		},
+		TriggerFn: func(testCtx *testutils.TestContext) (map[fwk.ClusterEvent]uint64, error) {
+			return map[fwk.ClusterEvent]uint64{}, nil
+		},
+		WaitingInUnschedulable:    true,
+		WantRequeuedPods:          sets.Set[string]{},
+		EnableSchedulingQueueHint: sets.New(true),
+		EnableGangScheduling:      true,
+	},
+	{
+		Name:          "Unscheduled pods in gang are requeued when a new node with sufficient capacity is added",
+		EnablePlugins: []string{names.GangScheduling},
+		InitialNodes: []*v1.Node{
+			st.MakeNode().Name("fake-node1").Capacity(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).Obj(),
+			st.MakeNode().Name("fake-node2").Capacity(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).Obj(),
+		},
+		InitialWorkloads: []*schedulingapi.Workload{
+			st.MakeWorkload().Name("w1").PodGroup(st.MakePodGroup().Name("pg1").MinCount(3).Obj()).Obj(),
+		},
+		Pods: []*v1.Pod{
+			st.MakePod().Name("pod1").Container("image").
+				Req(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).
+				Workload(&v1.WorkloadReference{Name: "w1", PodGroup: "pg1"}).Obj(),
+			st.MakePod().Name("pod2").Container("image").
+				Req(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).
+				Workload(&v1.WorkloadReference{Name: "w1", PodGroup: "pg1"}).Obj(),
+			st.MakePod().Name("pod3").Container("image").
+				Req(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).
+				Workload(&v1.WorkloadReference{Name: "w1", PodGroup: "pg1"}).Obj(),
+		},
+		TriggerFn: func(testCtx *testutils.TestContext) (map[fwk.ClusterEvent]uint64, error) {
+			node := st.MakeNode().Name("fake-node3").Capacity(map[v1.ResourceName]string{v1.ResourceCPU: "1"}).Obj()
+			if _, err := testCtx.ClientSet.CoreV1().Nodes().Create(testCtx.Ctx, node, metav1.CreateOptions{}); err != nil {
+				return nil, fmt.Errorf("failed to create node: %w", err)
+			}
+			return map[fwk.ClusterEvent]uint64{{Resource: fwk.Node, ActionType: fwk.Add}: 1}, nil
+		},
+		WaitingInUnschedulable:    true,
+		WantRequeuedPods:          sets.New("pod1", "pod2", "pod3"),
+		EnableSchedulingQueueHint: sets.New(true),
+		EnableGangScheduling:      true,
+	},
 }
 
 // TestCoreResourceEnqueue verify Pods failed by in-tree default plugins can be
