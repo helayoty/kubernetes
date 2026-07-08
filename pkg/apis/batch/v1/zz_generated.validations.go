@@ -28,6 +28,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	apicorev1 "k8s.io/api/core/v1"
 	v1alpha3 "k8s.io/api/scheduling/v1alpha3"
+	validation "k8s.io/api/scheduling/v1alpha3/validation"
 	equality "k8s.io/apimachinery/pkg/api/equality"
 	operation "k8s.io/apimachinery/pkg/api/operation"
 	safe "k8s.io/apimachinery/pkg/api/safe"
@@ -35,7 +36,6 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	field "k8s.io/apimachinery/pkg/util/validation/field"
 	corev1 "k8s.io/kubernetes/pkg/apis/core/v1"
-	schedulingv1alpha3 "k8s.io/kubernetes/pkg/apis/scheduling/v1alpha3"
 )
 
 func init() { localSchemeBuilder.Register(RegisterValidations) }
@@ -246,7 +246,7 @@ func Validate_JobSchedulingConfiguration(
 				return // do not proceed
 			}
 			// call the type's validation function
-			errs = append(errs, schedulingv1alpha3.Validate_WorkloadPodGroupSchedulingPolicy(ctx, op, fldPath, obj, oldObj)...)
+			errs = append(errs, validation.Validate_WorkloadPodGroupSchedulingPolicy(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}
 		oldVal := safe.Field(oldObj,
@@ -280,7 +280,7 @@ func Validate_JobSchedulingConfiguration(
 				return // do not proceed
 			}
 			// call the type's validation function
-			errs = append(errs, schedulingv1alpha3.Validate_WorkloadPodGroupSchedulingConstraints(ctx, op, fldPath, obj, oldObj)...)
+			errs = append(errs, validation.Validate_WorkloadPodGroupSchedulingConstraints(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}
 		oldVal := safe.Field(oldObj,
@@ -314,7 +314,7 @@ func Validate_JobSchedulingConfiguration(
 				return // do not proceed
 			}
 			// call the type's validation function
-			errs = append(errs, schedulingv1alpha3.Validate_WorkloadPodGroupDisruptionMode(ctx, op, fldPath, obj, oldObj)...)
+			errs = append(errs, validation.Validate_WorkloadPodGroupDisruptionMode(ctx, op, fldPath, obj, oldObj)...)
 			return
 		}
 		oldVal := safe.Field(oldObj,
@@ -368,7 +368,7 @@ func Validate_JobSchedulingConfiguration(
 			if e := validate.EachValSliceVal(ctx, op, fldPath, obj, oldObj,
 				func(a *v1alpha3.WorkloadPodGroupResourceClaim, b *v1alpha3.WorkloadPodGroupResourceClaim) bool {
 					return a.Name == b.Name
-				}, validate.SemanticDeepEqual, schedulingv1alpha3.Validate_WorkloadPodGroupResourceClaim); len(e) != 0 {
+				}, validate.SemanticDeepEqual, validation.Validate_WorkloadPodGroupResourceClaim); len(e) != 0 {
 				errs = append(errs, e...)
 			}
 			return

@@ -17,6 +17,7 @@ limitations under the License.
 package workloadbuilder
 
 import (
+	"context"
 	"testing"
 
 	schedulingv1alpha3 "k8s.io/api/scheduling/v1alpha3"
@@ -25,12 +26,19 @@ import (
 )
 
 func TestValidateSchedulingPolicy(t *testing.T) {
+	basic := &schedulingv1alpha3.WorkloadPodGroupBasicSchedulingPolicy{}
+	gang := func(minCount int32) *schedulingv1alpha3.WorkloadPodGroupGangSchedulingPolicy {
+		return &schedulingv1alpha3.WorkloadPodGroupGangSchedulingPolicy{MinCount: ptr.To(minCount)}
+	}
+
 	tests := []struct {
-		name     string
-		policy   *schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy
-		allowed  []SchedulingPolicyOption
-		wantErrs int
-		wantType field.ErrorType
+		name      string
+		policy    *schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy
+		oldPolicy *schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy
+		update    bool
+		allowed   []SchedulingPolicyOption
+		wantErrs  int
+		wantType  field.ErrorType
 	}{
 		{
 			name:     "nil policy is always valid",
@@ -40,20 +48,20 @@ func TestValidateSchedulingPolicy(t *testing.T) {
 		},
 		{
 			name:     "basic allowed",
-			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Basic: &schedulingv1alpha3.WorkloadPodGroupBasicSchedulingPolicy{}},
+			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Basic: basic},
 			allowed:  []SchedulingPolicyOption{BasicPolicy, GangPolicy},
 			wantErrs: 0,
 		},
 		{
 			name:     "basic forbidden when not allow-listed",
-			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Basic: &schedulingv1alpha3.WorkloadPodGroupBasicSchedulingPolicy{}},
+			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Basic: basic},
 			allowed:  []SchedulingPolicyOption{GangPolicy},
 			wantErrs: 1,
 			wantType: field.ErrorTypeForbidden,
 		},
 		{
 			name:     "gang allowed",
-			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: &schedulingv1alpha3.WorkloadPodGroupGangSchedulingPolicy{MinCount: ptr.To[int32](4)}},
+			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(4)},
 			allowed:  []SchedulingPolicyOption{GangPolicy},
 			wantErrs: 0,
 		},
@@ -65,26 +73,75 @@ func TestValidateSchedulingPolicy(t *testing.T) {
 			wantType: field.ErrorTypeForbidden,
 		},
 		{
-			name:     "empty policy is left to declarative validation",
+			name:     "empty policy fails union validation",
 			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{},
 			allowed:  []SchedulingPolicyOption{BasicPolicy, GangPolicy},
-			wantErrs: 0,
+			wantErrs: 1,
+			wantType: field.ErrorTypeInvalid,
 		},
 		{
-			name: "both policies set flags only the non-allow-listed one",
+			name: "both policies set flags the non-allow-listed one and the union violation",
 			policy: &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{
-				Basic: &schedulingv1alpha3.WorkloadPodGroupBasicSchedulingPolicy{},
-				Gang:  &schedulingv1alpha3.WorkloadPodGroupGangSchedulingPolicy{MinCount: ptr.To[int32](1)},
+				Basic: basic,
+				Gang:  gang(1),
 			},
 			allowed:  []SchedulingPolicyOption{BasicPolicy},
-			wantErrs: 1,
+			wantErrs: 2,
 			wantType: field.ErrorTypeForbidden,
+		},
+		{
+			name:     "gang minCount below minimum",
+			policy:   &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(0)},
+			allowed:  []SchedulingPolicyOption{GangPolicy},
+			wantErrs: 1,
+			wantType: field.ErrorTypeInvalid,
+		},
+		{
+			name:      "update with unchanged gang policy is ratcheted",
+			policy:    &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(2)},
+			oldPolicy: &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(2)},
+			update:    true,
+			allowed:   []SchedulingPolicyOption{GangPolicy},
+			wantErrs:  0,
+		},
+		{
+			name:      "update cannot switch basic to gang",
+			policy:    &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(2)},
+			oldPolicy: &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Basic: basic},
+			update:    true,
+			allowed:   []SchedulingPolicyOption{BasicPolicy, GangPolicy},
+			wantErrs:  2, // basic is immutable, gang cannot be set once created
+			wantType:  field.ErrorTypeInvalid,
+		},
+		{
+			name:      "update cannot switch gang to basic",
+			policy:    &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Basic: basic},
+			oldPolicy: &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(2)},
+			update:    true,
+			allowed:   []SchedulingPolicyOption{BasicPolicy, GangPolicy},
+			wantErrs:  2, // basic is immutable, gang cannot be cleared once set
+			wantType:  field.ErrorTypeInvalid,
+		},
+		{
+			name:      "update revalidates a changed minCount",
+			policy:    &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(0)},
+			oldPolicy: &schedulingv1alpha3.WorkloadPodGroupSchedulingPolicy{Gang: gang(2)},
+			update:    true,
+			allowed:   []SchedulingPolicyOption{GangPolicy},
+			wantErrs:  1,
+			wantType:  field.ErrorTypeInvalid,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errs := ValidateSchedulingPolicy(tt.policy, field.NewPath("policy"), tt.allowed...)
+			ctx := context.Background()
+			var errs field.ErrorList
+			if tt.update {
+				errs = ValidateSchedulingPolicyUpdate(ctx, tt.policy, tt.oldPolicy, field.NewPath("policy"), tt.allowed...)
+			} else {
+				errs = ValidateSchedulingPolicy(ctx, tt.policy, field.NewPath("policy"), tt.allowed...)
+			}
 			if len(errs) != tt.wantErrs {
 				t.Fatalf("expected %d error(s), got %d: %v", tt.wantErrs, len(errs), errs)
 			}
@@ -96,9 +153,14 @@ func TestValidateSchedulingPolicy(t *testing.T) {
 }
 
 func TestValidateDisruptionMode(t *testing.T) {
+	single := &schedulingv1alpha3.WorkloadPodGroupSingleDisruptionMode{}
+	all := &schedulingv1alpha3.WorkloadPodGroupAllDisruptionMode{}
+
 	tests := []struct {
 		name     string
 		mode     *schedulingv1alpha3.WorkloadPodGroupDisruptionMode
+		oldMode  *schedulingv1alpha3.WorkloadPodGroupDisruptionMode
+		update   bool
 		allowed  []DisruptionModeOption
 		wantErrs int
 		wantType field.ErrorType
@@ -111,38 +173,53 @@ func TestValidateDisruptionMode(t *testing.T) {
 		},
 		{
 			name:     "single allowed",
-			mode:     &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{Single: &schedulingv1alpha3.WorkloadPodGroupSingleDisruptionMode{}},
+			mode:     &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{Single: single},
 			allowed:  []DisruptionModeOption{SingleMode},
 			wantErrs: 0,
 		},
 		{
 			name:     "all forbidden when not allow-listed",
-			mode:     &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{All: &schedulingv1alpha3.WorkloadPodGroupAllDisruptionMode{}},
+			mode:     &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{All: all},
 			allowed:  []DisruptionModeOption{SingleMode},
 			wantErrs: 1,
 			wantType: field.ErrorTypeForbidden,
 		},
 		{
-			name:     "empty mode is left to declarative validation",
+			name:     "empty mode fails union validation",
 			mode:     &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{},
 			allowed:  []DisruptionModeOption{SingleMode, AllMode},
-			wantErrs: 0,
+			wantErrs: 1,
+			wantType: field.ErrorTypeInvalid,
 		},
 		{
-			name: "both modes set flags only the non-allow-listed one",
+			name: "both modes set flags the non-allow-listed one and the union violation",
 			mode: &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{
-				Single: &schedulingv1alpha3.WorkloadPodGroupSingleDisruptionMode{},
-				All:    &schedulingv1alpha3.WorkloadPodGroupAllDisruptionMode{},
+				Single: single,
+				All:    all,
 			},
 			allowed:  []DisruptionModeOption{AllMode},
-			wantErrs: 1,
+			wantErrs: 2,
 			wantType: field.ErrorTypeForbidden,
+		},
+		{
+			name:     "update can switch single to all",
+			mode:     &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{All: all},
+			oldMode:  &schedulingv1alpha3.WorkloadPodGroupDisruptionMode{Single: single},
+			update:   true,
+			allowed:  []DisruptionModeOption{SingleMode, AllMode},
+			wantErrs: 0,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errs := ValidateDisruptionMode(tt.mode, field.NewPath("disruption"), tt.allowed...)
+			ctx := context.Background()
+			var errs field.ErrorList
+			if tt.update {
+				errs = ValidateDisruptionModeUpdate(ctx, tt.mode, tt.oldMode, field.NewPath("disruption"), tt.allowed...)
+			} else {
+				errs = ValidateDisruptionMode(ctx, tt.mode, field.NewPath("disruption"), tt.allowed...)
+			}
 			if len(errs) != tt.wantErrs {
 				t.Fatalf("expected %d error(s), got %d: %v", tt.wantErrs, len(errs), errs)
 			}
