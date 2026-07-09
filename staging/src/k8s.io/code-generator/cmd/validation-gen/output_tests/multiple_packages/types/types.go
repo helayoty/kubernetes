@@ -14,13 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package validation
+// Package types holds the shared input types generated into ../registered and
+// ../external and referenced by ../consumer.
+package types
 
-import (
-	v1alpha3 "k8s.io/api/scheduling/v1alpha3"
-)
+type T1 struct {
+	TypeMeta int
 
-// localSchemeBuilder is used by the generated validation code to register
-// validation functions on the scheduling/v1alpha3 SchemeBuilder. Registration
-// only happens for schemes built by consumers that import this package.
-var localSchemeBuilder = &v1alpha3.SchemeBuilder
+	// +k8s:validateFalse="field T1.T2"
+	T2 T2 `json:"t2"`
+
+	// +k8s:eachVal=+k8s:validateFalse="field T1.List[*]"
+	List []T2 `json:"list"`
+}
+
+type T2 struct {
+	// +k8s:validateFalse="field T2.S"
+	S string `json:"s"`
+}
+
+// T3 has no TypeMeta, so only external's validation-gen=* selects it.
+type T3 struct {
+	// +k8s:validateFalse="field T3.S"
+	S string `json:"s"`
+}

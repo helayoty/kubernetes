@@ -14,13 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:deepcopy-gen=package
-// +k8s:protobuf-gen=package
-// +k8s:openapi-gen=true
-// +k8s:openapi-model-package=io.k8s.api.scheduling.v1alpha3
+// A non-registering copy of ../types' validators, selecting all types via *.
 // +k8s:validation-gen=*
+// +k8s:validation-gen-input=k8s.io/code-generator/cmd/validation-gen/output_tests/multiple_packages/types
 // +k8s:validation-gen-scheme-registry=nil
 
-// +groupName=scheduling.k8s.io
-
-package v1alpha3
+// This is a test package.
+// +k8s:validation-gen-nolint
+package external

@@ -14,13 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:deepcopy-gen=package
-// +k8s:protobuf-gen=package
-// +k8s:openapi-gen=true
-// +k8s:openapi-model-package=io.k8s.api.scheduling.v1alpha3
-// +k8s:validation-gen=*
-// +k8s:validation-gen-scheme-registry=nil
+package registered
 
-// +groupName=scheduling.k8s.io
+import (
+	"testing"
 
-package v1alpha3
+	"k8s.io/code-generator/cmd/validation-gen/output_tests/multiple_packages/types"
+)
+
+// Test runs the registering copy through its scheme.
+func Test(t *testing.T) {
+	st := localSchemeBuilder.Test(t)
+
+	st.Value(&types.T1{}).ExpectValidateFalseByPath(map[string][]string{
+		"t2":   {"field T1.T2"},
+		"t2.s": {"field T2.S"},
+	})
+}

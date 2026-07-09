@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:validation-gen=TypesWithField=TypeMeta
-// +k8s:validation-gen-input=k8s.io/api/scheduling/v1alpha3
+package consumer
 
-// Package validation holds generated declarative validation for
-// scheduling/v1alpha3 types. It lives next to the API types (instead of
-// k8s.io/kubernetes/pkg/apis) so that out-of-tree consumers, such as
-// workload controllers using the workloadbuilder library, can run the same
-// validation the kube-apiserver enforces.
-package validation
+import "k8s.io/code-generator/cmd/validation-gen/output_tests/multiple_packages/types"
+
+type Consumer struct {
+	TypeMeta int
+
+	Shared types.T2 `json:"shared"`
+}

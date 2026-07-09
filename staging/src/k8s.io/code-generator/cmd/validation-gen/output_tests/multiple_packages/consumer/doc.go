@@ -14,13 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// +k8s:deepcopy-gen=package
-// +k8s:protobuf-gen=package
-// +k8s:openapi-gen=true
-// +k8s:openapi-model-package=io.k8s.api.scheduling.v1alpha3
-// +k8s:validation-gen=*
-// +k8s:validation-gen-scheme-registry=nil
+// Its types reference ../types; validators must call the canonical (registered) copy.
+// +k8s:validation-gen=TypesWithField=TypeMeta
+// +k8s:validation-gen-scheme-registry=k8s.io/code-generator/cmd/validation-gen/testscheme.Scheme
 
-// +groupName=scheduling.k8s.io
+// This is a test package.
+// +k8s:validation-gen-nolint
+package consumer
 
-package v1alpha3
+import "k8s.io/code-generator/cmd/validation-gen/testscheme"
+
+var localSchemeBuilder = testscheme.New()
