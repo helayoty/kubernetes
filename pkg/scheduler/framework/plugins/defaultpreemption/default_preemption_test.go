@@ -32,6 +32,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
+	activationv1alpha1 "k8s.io/api/activation/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1"
 	"k8s.io/api/scheduling/v1alpha3"
@@ -3394,6 +3395,48 @@ func TestSelectVictimsOnNode(t *testing.T) {
 			},
 			preemptor:                  st.MakePod().Name("p").UID("p").Priority(highPriority).Req(largeRes).Obj(),
 			expectedPods:               sets.New("pod-a", "pod-b"),
+			expectedNumViolatingVictim: 0,
+		},
+		{
+			name:      "ActivationPool: claimed capacity pod is exempt from preemption when gate is on",
+			nodeNames: []string{"node1"},
+			mainNode:  "node1",
+			features:  feature.Features{EnableActivationPool: true},
+			initPods: []*v1.Pod{
+				st.MakePod().Name("claimed").UID("v1").Node("node1").Priority(lowPriority).Req(largeRes).
+					Label(activationv1alpha1.LabelPoolName, "demo").
+					Annotation(activationv1alpha1.AnnotationState, activationv1alpha1.StateClaimed).Obj(),
+			},
+			preemptor:                  st.MakePod().Name("p").UID("p").Priority(highPriority).Req(largeRes).Obj(),
+			expectedPods:               nil,
+			expectedNumViolatingVictim: 0,
+			expectedStatus:             fwk.NewStatus(fwk.UnschedulableAndUnresolvable),
+		},
+		{
+			name:      "ActivationPool: claimed capacity pod is preemptible when gate is off",
+			nodeNames: []string{"node1"},
+			mainNode:  "node1",
+			initPods: []*v1.Pod{
+				st.MakePod().Name("claimed").UID("v1").Node("node1").Priority(lowPriority).Req(largeRes).
+					Label(activationv1alpha1.LabelPoolName, "demo").
+					Annotation(activationv1alpha1.AnnotationState, activationv1alpha1.StateClaimed).Obj(),
+			},
+			preemptor:                  st.MakePod().Name("p").UID("p").Priority(highPriority).Req(largeRes).Obj(),
+			expectedPods:               sets.New("claimed"),
+			expectedNumViolatingVictim: 0,
+		},
+		{
+			name:      "ActivationPool: warm capacity pod stays preemptible when gate is on",
+			nodeNames: []string{"node1"},
+			mainNode:  "node1",
+			features:  feature.Features{EnableActivationPool: true},
+			initPods: []*v1.Pod{
+				st.MakePod().Name("warm").UID("v1").Node("node1").Priority(lowPriority).Req(largeRes).
+					Label(activationv1alpha1.LabelPoolName, "demo").
+					Annotation(activationv1alpha1.AnnotationState, activationv1alpha1.StateWarm).Obj(),
+			},
+			preemptor:                  st.MakePod().Name("p").UID("p").Priority(highPriority).Req(largeRes).Obj(),
+			expectedPods:               sets.New("warm"),
 			expectedNumViolatingVictim: 0,
 		},
 	}

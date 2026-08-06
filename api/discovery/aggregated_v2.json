@@ -2613,6 +2613,54 @@
     },
     {
       "metadata": {
+        "name": "activation.k8s.io"
+      },
+      "versions": [
+        {
+          "freshness": "Current",
+          "resources": [
+            {
+              "resource": "activationpools",
+              "responseKind": {
+                "group": "",
+                "kind": "ActivationPool",
+                "version": ""
+              },
+              "scope": "Namespaced",
+              "singularResource": "activationpool",
+              "subresources": [
+                {
+                  "responseKind": {
+                    "group": "",
+                    "kind": "ActivationPool",
+                    "version": ""
+                  },
+                  "subresource": "status",
+                  "verbs": [
+                    "get",
+                    "patch",
+                    "update"
+                  ]
+                }
+              ],
+              "verbs": [
+                "create",
+                "delete",
+                "deletecollection",
+                "get",
+                "list",
+                "patch",
+                "update",
+                "watch"
+              ]
+            }
+          ],
+          "version": "v1alpha1"
+        }
+      ]
+    },
+    {
+      "metadata": {
         "name": "lifecycle.k8s.io"
       },
       "versions": [

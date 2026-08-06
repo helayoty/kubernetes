@@ -74,6 +74,7 @@ kube::golang::server_targets() {
     cmd/kubelet
     cmd/kubeadm
     cmd/kube-scheduler
+    cmd/kube-activation-manager
     staging/src/k8s.io/component-base/logs/kube-log-runner
     staging/src/k8s.io/kube-aggregator
     staging/src/k8s.io/apiextensions-apiserver
@@ -326,6 +327,7 @@ readonly KUBE_STATIC_BINARIES=(
   kube-apiserver
   kube-controller-manager
   kube-scheduler
+  kube-activation-manager
   kube-proxy
   kube-log-runner
   kubeadm

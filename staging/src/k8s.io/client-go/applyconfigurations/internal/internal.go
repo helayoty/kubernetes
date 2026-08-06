@@ -39,6 +39,114 @@ func Parser() *typed.Parser {
 var parserOnce sync.Once
 var parser *typed.Parser
 var schemaYAML = typed.YAMLObject(`types:
+- name: io.k8s.api.activation.v1alpha1.ActivationPool
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.ActivationPoolSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.ActivationPoolStatus
+      default: {}
+- name: io.k8s.api.activation.v1alpha1.ActivationPoolSpec
+  map:
+    fields:
+    - name: activation
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.ActivationSpec
+      default: {}
+    - name: durability
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.DurabilitySpec
+      default: {}
+    - name: endpointPort
+      type:
+        scalar: numeric
+    - name: priorityClassName
+      type:
+        scalar: string
+    - name: source
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.PoolSource
+    - name: supply
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.SupplySpec
+      default: {}
+    - name: templateRef
+      type:
+        namedType: io.k8s.api.core.v1.TypedLocalObjectReference
+      default: {}
+    - name: warm
+      type:
+        namedType: io.k8s.api.activation.v1alpha1.WarmSpec
+      default: {}
+- name: io.k8s.api.activation.v1alpha1.ActivationPoolStatus
+  map:
+    fields:
+    - name: conditions
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Condition
+          elementRelationship: associative
+          keys:
+          - type
+- name: io.k8s.api.activation.v1alpha1.ActivationSpec
+  map:
+    fields:
+    - name: coalescing
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Duration
+    - name: deadline
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.Duration
+- name: io.k8s.api.activation.v1alpha1.DurabilitySpec
+  map:
+    fields:
+    - name: offered
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+- name: io.k8s.api.activation.v1alpha1.PoolSource
+  map:
+    fields:
+    - name: checkpointRef
+      type:
+        scalar: string
+- name: io.k8s.api.activation.v1alpha1.SupplySpec
+  map:
+    fields:
+    - name: capacityRequestClass
+      type:
+        scalar: string
+    - name: deviceClaimScope
+      type:
+        scalar: string
+- name: io.k8s.api.activation.v1alpha1.WarmSpec
+  map:
+    fields:
+    - name: max
+      type:
+        scalar: numeric
+      default: 0
+    - name: min
+      type:
+        scalar: numeric
+      default: 0
 - name: io.k8s.api.admissionregistration.v1.ApplyConfiguration
   map:
     fields:
@@ -17486,6 +17594,8 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: propagationPolicy
       type:
         scalar: string
+- name: io.k8s.apimachinery.pkg.apis.meta.v1.Duration
+  scalar: string
 - name: io.k8s.apimachinery.pkg.apis.meta.v1.FieldsV1
   map:
     elementType:

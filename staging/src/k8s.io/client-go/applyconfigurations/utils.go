@@ -19,8 +19,9 @@ limitations under the License.
 package applyconfigurations
 
 import (
+	v1alpha1 "k8s.io/api/activation/v1alpha1"
 	v1 "k8s.io/api/admissionregistration/v1"
-	v1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
+	admissionregistrationv1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
 	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
 	apiserverinternalv1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -74,8 +75,9 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
+	activationv1alpha1 "k8s.io/client-go/applyconfigurations/activation/v1alpha1"
 	admissionregistrationv1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1"
-	admissionregistrationv1alpha1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1"
+	applyconfigurationsadmissionregistrationv1alpha1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1alpha1"
 	admissionregistrationv1beta1 "k8s.io/client-go/applyconfigurations/admissionregistration/v1beta1"
 	applyconfigurationsapiserverinternalv1alpha1 "k8s.io/client-go/applyconfigurations/apiserverinternal/v1alpha1"
 	applyconfigurationsappsv1 "k8s.io/client-go/applyconfigurations/apps/v1"
@@ -133,7 +135,25 @@ import (
 // apply configuration type exists for the given GroupVersionKind.
 func ForKind(kind schema.GroupVersionKind) interface{} {
 	switch kind {
-	// Group=admissionregistration.k8s.io, Version=v1
+	// Group=activation.k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithKind("ActivationPool"):
+		return &activationv1alpha1.ActivationPoolApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ActivationPoolSpec"):
+		return &activationv1alpha1.ActivationPoolSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ActivationPoolStatus"):
+		return &activationv1alpha1.ActivationPoolStatusApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("ActivationSpec"):
+		return &activationv1alpha1.ActivationSpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("DurabilitySpec"):
+		return &activationv1alpha1.DurabilitySpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("PoolSource"):
+		return &activationv1alpha1.PoolSourceApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("SupplySpec"):
+		return &activationv1alpha1.SupplySpecApplyConfiguration{}
+	case v1alpha1.SchemeGroupVersion.WithKind("WarmSpec"):
+		return &activationv1alpha1.WarmSpecApplyConfiguration{}
+
+		// Group=admissionregistration.k8s.io, Version=v1
 	case v1.SchemeGroupVersion.WithKind("ApplyConfiguration"):
 		return &admissionregistrationv1.ApplyConfigurationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("AuditAnnotation"):
@@ -196,50 +216,50 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &admissionregistrationv1.WebhookClientConfigApplyConfiguration{}
 
 		// Group=admissionregistration.k8s.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithKind("ApplyConfiguration"):
-		return &admissionregistrationv1alpha1.ApplyConfigurationApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("AuditAnnotation"):
-		return &admissionregistrationv1alpha1.AuditAnnotationApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ExpressionWarning"):
-		return &admissionregistrationv1alpha1.ExpressionWarningApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("JSONPatch"):
-		return &admissionregistrationv1alpha1.JSONPatchApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("MatchCondition"):
-		return &admissionregistrationv1alpha1.MatchConditionApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("MatchResources"):
-		return &admissionregistrationv1alpha1.MatchResourcesApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicy"):
-		return &admissionregistrationv1alpha1.MutatingAdmissionPolicyApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicyBinding"):
-		return &admissionregistrationv1alpha1.MutatingAdmissionPolicyBindingApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicyBindingSpec"):
-		return &admissionregistrationv1alpha1.MutatingAdmissionPolicyBindingSpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicySpec"):
-		return &admissionregistrationv1alpha1.MutatingAdmissionPolicySpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("Mutation"):
-		return &admissionregistrationv1alpha1.MutationApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("NamedRuleWithOperations"):
-		return &admissionregistrationv1alpha1.NamedRuleWithOperationsApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ParamKind"):
-		return &admissionregistrationv1alpha1.ParamKindApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ParamRef"):
-		return &admissionregistrationv1alpha1.ParamRefApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("TypeChecking"):
-		return &admissionregistrationv1alpha1.TypeCheckingApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicy"):
-		return &admissionregistrationv1alpha1.ValidatingAdmissionPolicyApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicyBinding"):
-		return &admissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicyBindingSpec"):
-		return &admissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingSpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicySpec"):
-		return &admissionregistrationv1alpha1.ValidatingAdmissionPolicySpecApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicyStatus"):
-		return &admissionregistrationv1alpha1.ValidatingAdmissionPolicyStatusApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("Validation"):
-		return &admissionregistrationv1alpha1.ValidationApplyConfiguration{}
-	case v1alpha1.SchemeGroupVersion.WithKind("Variable"):
-		return &admissionregistrationv1alpha1.VariableApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ApplyConfiguration"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ApplyConfigurationApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("AuditAnnotation"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.AuditAnnotationApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ExpressionWarning"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ExpressionWarningApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("JSONPatch"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.JSONPatchApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("MatchCondition"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MatchConditionApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("MatchResources"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MatchResourcesApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicy"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MutatingAdmissionPolicyApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicyBinding"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MutatingAdmissionPolicyBindingApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicyBindingSpec"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MutatingAdmissionPolicyBindingSpecApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("MutatingAdmissionPolicySpec"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MutatingAdmissionPolicySpecApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("Mutation"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.MutationApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("NamedRuleWithOperations"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.NamedRuleWithOperationsApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ParamKind"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ParamKindApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ParamRef"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ParamRefApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("TypeChecking"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.TypeCheckingApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicy"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ValidatingAdmissionPolicyApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicyBinding"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicyBindingSpec"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingSpecApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicySpec"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ValidatingAdmissionPolicySpecApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("ValidatingAdmissionPolicyStatus"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ValidatingAdmissionPolicyStatusApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("Validation"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.ValidationApplyConfiguration{}
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithKind("Variable"):
+		return &applyconfigurationsadmissionregistrationv1alpha1.VariableApplyConfiguration{}
 
 		// Group=admissionregistration.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("ApplyConfiguration"):

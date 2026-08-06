@@ -21,8 +21,9 @@ package informers
 import (
 	fmt "fmt"
 
+	v1alpha1 "k8s.io/api/activation/v1alpha1"
 	v1 "k8s.io/api/admissionregistration/v1"
-	v1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
+	admissionregistrationv1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
 	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
 	apiserverinternalv1alpha1 "k8s.io/api/apiserverinternal/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -101,7 +102,11 @@ func (f *genericInformer) Lister() cache.GenericLister {
 // TODO extend this to unknown resources with a client pool
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
-	// Group=admissionregistration.k8s.io, Version=v1
+	// Group=activation.k8s.io, Version=v1alpha1
+	case v1alpha1.SchemeGroupVersion.WithResource("activationpools"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Activation().V1alpha1().ActivationPools().Informer()}, nil
+
+		// Group=admissionregistration.k8s.io, Version=v1
 	case v1.SchemeGroupVersion.WithResource("mutatingadmissionpolicies"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1().MutatingAdmissionPolicies().Informer()}, nil
 	case v1.SchemeGroupVersion.WithResource("mutatingadmissionpolicybindings"):
@@ -116,13 +121,13 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1().ValidatingWebhookConfigurations().Informer()}, nil
 
 		// Group=admissionregistration.k8s.io, Version=v1alpha1
-	case v1alpha1.SchemeGroupVersion.WithResource("mutatingadmissionpolicies"):
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithResource("mutatingadmissionpolicies"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1alpha1().MutatingAdmissionPolicies().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("mutatingadmissionpolicybindings"):
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithResource("mutatingadmissionpolicybindings"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1alpha1().MutatingAdmissionPolicyBindings().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("validatingadmissionpolicies"):
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithResource("validatingadmissionpolicies"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1alpha1().ValidatingAdmissionPolicies().Informer()}, nil
-	case v1alpha1.SchemeGroupVersion.WithResource("validatingadmissionpolicybindings"):
+	case admissionregistrationv1alpha1.SchemeGroupVersion.WithResource("validatingadmissionpolicybindings"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Admissionregistration().V1alpha1().ValidatingAdmissionPolicyBindings().Informer()}, nil
 
 		// Group=admissionregistration.k8s.io, Version=v1beta1

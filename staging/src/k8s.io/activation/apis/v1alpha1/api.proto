@@ -1,0 +1,102 @@
+/*
+Copyright 2026 The Kubernetes Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// To regenerate api.pb.go run `hack/update-codegen.sh protobindings`
+syntax = "proto3";
+
+package k8s.io.activation.apis.v1alpha1;
+option go_package = "k8s.io/activation/apis/v1alpha1";
+
+// Activation is the synchronous activation contract: report demand for a pool
+// and receive bound, ready capacity within a request-scoped deadline.
+service Activation {
+  // Activate blocks up to deadline for bound, ready capacity.
+  // It does NOT execute a turn — execution is a separate exchange against
+  // the returned endpoint.
+  rpc Activate(ActivateRequest) returns (ActivateResponse);
+
+  // ReportDemand is an aggregate demand hint used to refill pools ahead of need.
+  rpc ReportDemand(DemandReport) returns (DemandAck);
+}
+
+message ActivateRequest {
+  // pool is the namespaced ActivationPool name to bind from.
+  // Format: "<namespace>/<name>" or just "<name>" when namespace is implied by authz context.
+  string pool = 1;
+  // count is the number of sandboxes to bind in one call.
+  uint32 count = 2;
+  // deadline_ms is the bind budget for this call in milliseconds.
+  // If zero, the pool's spec.activation.deadline applies.
+  // int64 ms (not google.protobuf.Duration): in-tree gRPC api.proto files do not
+  // import well-known Duration, and third_party/protobuf lacks duration.proto.
+  int64 deadline_ms = 3;
+  // durability is the required durability tier. Default BEST_EFFORT_DURABLE.
+  DurabilityTier durability = 4;
+}
+
+enum DurabilityTier {
+  // Journal write may lag the bind. Fenced and crash-safe (no corruption),
+  // but the session can be lost on node death before the journal commits.
+  BEST_EFFORT_DURABLE = 0;
+
+  // Read-your-writes-durable before first response. Binds only on a
+  // durability-capable runtime; pays an explicit commit-latency floor.
+  SYNC_DURABLE_CREATE = 1;
+}
+
+message ActivateResponse {
+  oneof result {
+    Bound bound = 1;
+    // Deferred is returned on miss, deadline exceeded, or durability mismatch.
+    // Renamed from Pending to avoid colliding with the Pending pod phase.
+    Deferred deferred = 2;
+  }
+}
+
+message Bound {
+  // endpoints are the ready addresses for the bound sandbox(es).
+  repeated Endpoint endpoints = 1;
+  // bind_generation is monotonic per sandbox; the sandbox rejects any
+  // request carrying a stale generation.
+  uint64 bind_generation = 2;
+  // sandbox_id identifies the bound capacity pod (typically the pod UID).
+  string sandbox_id = 3;
+}
+
+message Endpoint {
+  string address = 1;
+  uint32 port = 2;
+}
+
+message Deferred {
+  // reason explains why the bind did not complete within the deadline.
+  string reason = 1;
+  // message is a human-readable detail.
+  string message = 2;
+}
+
+message DemandReport {
+  // pool is the ActivationPool the demand applies to.
+  string pool = 1;
+  // pending is the number of outstanding requests waiting on this pool.
+  uint32 pending = 2;
+}
+
+message DemandAck {
+  // backpressure advises routers to shift traffic before the pool is empty.
+  // Higher values mean stronger pressure; 0 means none.
+  uint32 backpressure = 1;
+}

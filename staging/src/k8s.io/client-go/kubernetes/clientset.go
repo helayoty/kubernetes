@@ -23,6 +23,7 @@ import (
 	http "net/http"
 
 	discovery "k8s.io/client-go/discovery"
+	activationv1alpha1 "k8s.io/client-go/kubernetes/typed/activation/v1alpha1"
 	admissionregistrationv1 "k8s.io/client-go/kubernetes/typed/admissionregistration/v1"
 	admissionregistrationv1alpha1 "k8s.io/client-go/kubernetes/typed/admissionregistration/v1alpha1"
 	admissionregistrationv1beta1 "k8s.io/client-go/kubernetes/typed/admissionregistration/v1beta1"
@@ -84,6 +85,7 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterfaces
+	ActivationV1alpha1() activationv1alpha1.ActivationV1alpha1Interface
 	AdmissionregistrationV1() admissionregistrationv1.AdmissionregistrationV1Interface
 	AdmissionregistrationV1alpha1() admissionregistrationv1alpha1.AdmissionregistrationV1alpha1Interface
 	AdmissionregistrationV1beta1() admissionregistrationv1beta1.AdmissionregistrationV1beta1Interface
@@ -144,6 +146,7 @@ type Interface interface {
 // Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
+	activationV1alpha1            *activationv1alpha1.ActivationV1alpha1Client
 	admissionregistrationV1       *admissionregistrationv1.AdmissionregistrationV1Client
 	admissionregistrationV1alpha1 *admissionregistrationv1alpha1.AdmissionregistrationV1alpha1Client
 	admissionregistrationV1beta1  *admissionregistrationv1beta1.AdmissionregistrationV1beta1Client
@@ -199,6 +202,11 @@ type Clientset struct {
 	storageV1alpha1               *storagev1alpha1.StorageV1alpha1Client
 	storagemigrationV1            *storagemigrationv1.StoragemigrationV1Client
 	storagemigrationV1beta1       *storagemigrationv1beta1.StoragemigrationV1beta1Client
+}
+
+// ActivationV1alpha1 retrieves the ActivationV1alpha1Client
+func (c *Clientset) ActivationV1alpha1() activationv1alpha1.ActivationV1alpha1Interface {
+	return c.activationV1alpha1
 }
 
 // AdmissionregistrationV1 retrieves the AdmissionregistrationV1Client
@@ -520,6 +528,10 @@ func NewForConfigAndClient(c *rest.Config, httpClient *http.Client) (*Clientset,
 
 	var cs Clientset
 	var err error
+	cs.activationV1alpha1, err = activationv1alpha1.NewForConfigAndClient(&configShallowCopy, httpClient)
+	if err != nil {
+		return nil, err
+	}
 	cs.admissionregistrationV1, err = admissionregistrationv1.NewForConfigAndClient(&configShallowCopy, httpClient)
 	if err != nil {
 		return nil, err
@@ -761,6 +773,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
+	cs.activationV1alpha1 = activationv1alpha1.New(c)
 	cs.admissionregistrationV1 = admissionregistrationv1.New(c)
 	cs.admissionregistrationV1alpha1 = admissionregistrationv1alpha1.New(c)
 	cs.admissionregistrationV1beta1 = admissionregistrationv1beta1.New(c)

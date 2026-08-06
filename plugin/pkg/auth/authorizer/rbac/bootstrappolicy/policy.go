@@ -68,6 +68,7 @@ const (
 	admissionRegistrationGroup   = "admissionregistration.k8s.io"
 	storageVersionMigrationGroup = "storagemigration.k8s.io"
 	schedulingGroup              = "scheduling.k8s.io"
+	activationGroup              = "activation.k8s.io"
 )
 
 func addDefaultMetadata(obj runtime.Object) {

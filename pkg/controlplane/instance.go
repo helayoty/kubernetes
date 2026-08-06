@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"time"
 
+	activationv1alpha1 "k8s.io/api/activation/v1alpha1"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	admissionregistrationv1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
 	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
@@ -87,6 +88,7 @@ import (
 	kubeletclient "k8s.io/kubernetes/pkg/kubelet/client"
 
 	// RESTStorage installers
+	activationrest "k8s.io/kubernetes/pkg/registry/activation/rest"
 	admissionregistrationrest "k8s.io/kubernetes/pkg/registry/admissionregistration/rest"
 	apiserverinternalrest "k8s.io/kubernetes/pkg/registry/apiserverinternal/rest"
 	appsrest "k8s.io/kubernetes/pkg/registry/apps/rest"
@@ -422,6 +424,7 @@ func (c CompletedConfig) StorageProviders(client *kubernetes.Clientset) ([]contr
 	// handlers that we have.
 	providers := []controlplaneapiserver.RESTStorageProvider{
 		legacyRESTStorageProvider,
+		activationrest.RESTStorageProvider{},
 		apiserverinternalrest.StorageProvider{},
 		authenticationrest.RESTStorageProvider{Authenticator: c.ControlPlane.Generic.Authentication.Authenticator, APIAudiences: c.ControlPlane.Generic.Authentication.APIAudiences},
 		authorizationrest.RESTStorageProvider{Authorizer: c.ControlPlane.Generic.Authorization.Authorizer, RuleResolver: c.ControlPlane.Generic.RuleResolver},
@@ -517,6 +520,7 @@ var (
 	}
 	// alphaAPIGroupVersionsDisabledByDefault holds the alpha APIs we have for additional API groups only provided in kube-apiserver. They are always disabled by default.
 	alphaAPIGroupVersionsDisabledByDefault = []schema.GroupVersion{
+		activationv1alpha1.SchemeGroupVersion,
 		lifecyclev1alpha1.SchemeGroupVersion,
 		resourcev1alpha3.SchemeGroupVersion,
 		schedulingapiv1alpha3.SchemeGroupVersion,

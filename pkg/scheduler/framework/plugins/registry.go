@@ -18,6 +18,7 @@ package plugins
 
 import (
 	"k8s.io/apiserver/pkg/util/feature"
+	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/activationpool"
 	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/defaultbinder"
 	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/defaultpreemption"
 	"k8s.io/kubernetes/pkg/scheduler/framework/plugins/deferredpodscheduling"
@@ -51,6 +52,7 @@ import (
 func NewInTreeRegistry() runtime.Registry {
 	fts := plfeature.NewSchedulerFeaturesFromGates(feature.DefaultFeatureGate)
 	registry := runtime.Registry{
+		activationpool.Name:                  activationpool.New,
 		dynamicresources.Name:                runtime.FactoryAdapter(fts, dynamicresources.New),
 		imagelocality.Name:                   imagelocality.New,
 		tainttoleration.Name:                 runtime.FactoryAdapter(fts, tainttoleration.New),

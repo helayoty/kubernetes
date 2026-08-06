@@ -22,6 +22,7 @@ import (
 	"math/rand"
 	"sort"
 
+	activationv1alpha1 "k8s.io/api/activation/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	policy "k8s.io/api/policy/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -134,7 +135,21 @@ func New(_ context.Context, dpArgs runtime.Object, fh fwk.Handle, fts feature.Fe
 
 	// Default behavior: No additional filtering, beyond the internal requirement that the victim
 	// has lower priority than the preemptor.
+	//
+	// Exception (Phase 1 activation contract): a claimed ActivationPool capacity
+	// pod backs a live, synchronously-bound request. Evicting it would break that
+	// request mid-flight, so it is never an eligible victim while the gate is on.
+	// This deliberately overrides priority — a claimed pod is exempt even from a
+	// higher-priority preemptor; callers relying on preemption must size warm
+	// capacity accordingly.
 	pl.IsEligiblePod = func(nodeInfo fwk.NodeInfo, victim preemption.Victim, preemptor *v1.Pod) bool {
+		if pl.fts.EnableActivationPool {
+			for _, pi := range victim.Pods() {
+				if isClaimedActivationPod(pi.GetPod()) {
+					return false
+				}
+			}
+		}
 		return true
 	}
 
@@ -473,6 +488,14 @@ func (pl *DefaultPreemption) PodEligibleToPreemptOthers(_ context.Context, pod *
 		}
 	}
 	return true, ""
+}
+
+// isClaimedActivationPod reports whether pod is an ActivationPool capacity pod
+// currently holding a claim (state=claimed). Such pods back a live bound request
+// and are exempt from preemption; warm (idle) capacity pods are not.
+func isClaimedActivationPod(pod *v1.Pod) bool {
+	return pod.Labels[activationv1alpha1.LabelPoolName] != "" &&
+		pod.Annotations[activationv1alpha1.AnnotationState] == activationv1alpha1.StateClaimed
 }
 
 // isPreemptionAllowed returns whether the "victim" residing on "nodeInfo" can be preempted by the preemptor pod

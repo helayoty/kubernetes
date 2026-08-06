@@ -947,6 +947,7 @@ function codegen::protobindings() {
         "staging/src/k8s.io/cri-api/pkg/apis/runtime"
         "staging/src/k8s.io/externaljwt/apis"
         "staging/src/k8s.io/kubelet/pkg/apis/dra-health"
+        "staging/src/k8s.io/activation/apis"
     )
 
     kube::log::status "Generating protobuf bindings for ${#apis[@]} targets"

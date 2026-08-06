@@ -28,6 +28,7 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	wait "k8s.io/apimachinery/pkg/util/wait"
+	activation "k8s.io/client-go/informers/activation"
 	admissionregistration "k8s.io/client-go/informers/admissionregistration"
 	apiserverinternal "k8s.io/client-go/informers/apiserverinternal"
 	apps "k8s.io/client-go/informers/apps"
@@ -345,6 +346,7 @@ type SharedInformerFactory interface {
 	// client.
 	InformerFor(obj runtime.Object, newFunc internalinterfaces.NewInformerFunc) cache.SharedIndexInformer
 
+	Activation() activation.Interface
 	Admissionregistration() admissionregistration.Interface
 	Internal() apiserverinternal.Interface
 	Apps() apps.Interface
@@ -366,6 +368,10 @@ type SharedInformerFactory interface {
 	Scheduling() scheduling.Interface
 	Storage() storage.Interface
 	Storagemigration() storagemigration.Interface
+}
+
+func (f *sharedInformerFactory) Activation() activation.Interface {
+	return activation.New(f, f.namespace, f.tweakListOptions)
 }
 
 func (f *sharedInformerFactory) Admissionregistration() admissionregistration.Interface {

@@ -51,4 +51,8 @@ const (
 	// controller manager webhook server.  May be overridden by a flag at
 	// startup.
 	CloudControllerManagerWebhookPort = cpoptions.CloudControllerManagerWebhookPort
+	// KubeActivationManagerPort is the default secure port for the
+	// kube-activation-manager Activate gRPC server.
+	// May be overridden by a flag at startup.
+	KubeActivationManagerPort = 10269
 )

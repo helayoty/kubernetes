@@ -75,6 +75,13 @@ func applyFeatureGates(config *v1.Plugins) {
 	if utilfeature.DefaultFeatureGate.Enabled(features.TopologyAwareWorkloadScheduling) {
 		applyTopologyAwareWorkloadScheduling(config)
 	}
+	if utilfeature.DefaultFeatureGate.Enabled(features.ActivationPool) {
+		applyActivationPool(config)
+	}
+}
+
+func applyActivationPool(config *v1.Plugins) {
+	config.MultiPoint.Enabled = append(config.MultiPoint.Enabled, v1.Plugin{Name: names.ActivationPool, Weight: ptr.To[int32](1)})
 }
 
 func applyDynamicResources(config *v1.Plugins) {

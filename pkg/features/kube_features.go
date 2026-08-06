@@ -1060,6 +1060,13 @@ const (
 	// Initial implementation focused on ReadWriteOncePod volumes.
 	SELinuxMountReadWriteOncePod featuregate.Feature = "SELinuxMountReadWriteOncePod"
 
+	// owner: @helayoty
+	//
+	// Enables the activation.k8s.io ActivationPool API and the standalone
+	// kube-activation-manager, which serves the Activate / ReportDemand gRPC
+	// contract for binding warm capacity from ActivationPool objects.
+	ActivationPool featuregate.Feature = "ActivationPool"
+
 	// owner: @macsko
 	// kep: http://kep.k8s.io/5229
 	//
@@ -1343,6 +1350,10 @@ const (
 //
 // Entries are alphabetized.
 var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate.VersionedSpecs{
+	ActivationPool: {
+		{Version: version.MustParse("1.37"), Default: false, PreRelease: featuregate.Alpha},
+	},
+
 	AllowDNSOnlyNodeCSR: {
 		{Version: version.MustParse("1.0"), Default: true, PreRelease: featuregate.GA},
 		{Version: version.MustParse("1.31"), Default: false, PreRelease: featuregate.Deprecated},
@@ -2534,6 +2545,8 @@ var defaultVersionedKubernetesFeatureGates = map[featuregate.Feature]featuregate
 //
 // Entries are alphabetized.
 var defaultKubernetesFeatureGateDependencies = map[featuregate.Feature][]featuregate.Feature{
+	ActivationPool: {},
+
 	AllowDNSOnlyNodeCSR: {},
 
 	AllowInsecureKubeletCertificateSigningRequests: {},

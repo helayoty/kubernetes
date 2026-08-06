@@ -1,0 +1,148 @@
+# Phase 0 activation PoC demo manifests.
+#
+# Applied by run-demo.sh against a fork brought up with hack/local-up-cluster.sh
+# (feature gate ActivationPool enabled on apiserver + kube-controller-manager).
+#
+# What this creates:
+#   - a namespace for the demo,
+#   - a service account for capacity pods that lets the sandbox patch its own pod
+#     (state=claimed, bind-generation) on bind,
+#   - an authorized activate-client SA granted the custom "activate" verb, plus a
+#     deny-client SA with no such grant (for the SAR-deny case),
+#   - a PodTemplate running the agnhost activation-sandbox subcommand,
+#   - the ActivationPool the refill controller reconciles.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: activation-demo
+---
+# Capacity pods run as this SA so the sandbox can self-patch on bind.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: activation-sandbox
+  namespace: activation-demo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: activation-sandbox-selfpatch
+  namespace: activation-demo
+rules:
+  # The sandbox patches its own pod's annotations (state=claimed, bind-generation).
+  # RBAC cannot scope to "own object" without a name, so this is namespace-wide;
+  # acceptable for the PoC demo namespace.
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: activation-sandbox-selfpatch
+  namespace: activation-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: activation-sandbox-selfpatch
+subjects:
+  - kind: ServiceAccount
+    name: activation-sandbox
+    namespace: activation-demo
+---
+# Authorized Activate caller: granted the custom "activate" verb on the pool.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: activate-client
+  namespace: activation-demo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: activate-pools
+  namespace: activation-demo
+rules:
+  - apiGroups: ["activation.k8s.io"]
+    resources: ["activationpools"]
+    verbs: ["activate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: activate-client-can-activate
+  namespace: activation-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: activate-pools
+subjects:
+  - kind: ServiceAccount
+    name: activate-client
+    namespace: activation-demo
+---
+# Unauthorized caller for the SAR-deny case: exists, has no activate grant.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deny-client
+  namespace: activation-demo
+---
+apiVersion: v1
+kind: PodTemplate
+metadata:
+  name: demo-template
+  namespace: activation-demo
+template:
+  metadata:
+    labels:
+      app: activation-sandbox
+  spec:
+    serviceAccountName: activation-sandbox
+    # Reclaimable warm capacity; PoC uses a low priority so idle pods yield.
+    terminationGracePeriodSeconds: 1
+    containers:
+      - name: sandbox
+        # Must be an agnhost build that includes the activation-sandbox subcommand
+        # (bump agnhost VERSION + rebuild). Override with AGNHOST_IMAGE in run-demo.sh.
+        image: agnhost:activation-demo
+        imagePullPolicy: IfNotPresent
+        args: ["activation-sandbox", "--port=8080"]
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        ports:
+          - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 1
+          periodSeconds: 2
+---
+apiVersion: activation.k8s.io/v1alpha1
+kind: ActivationPool
+metadata:
+  name: demo
+  namespace: activation-demo
+spec:
+  templateRef:
+    kind: PodTemplate
+    name: demo-template
+  warm:
+    min: 2
+    max: 4
+  endpointPort: 8080
+  activation:
+    deadline: 800ms
+    coalescing: 50ms
+  durability:
+    offered:
+      - BEST_EFFORT_DURABLE

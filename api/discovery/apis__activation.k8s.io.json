@@ -1,0 +1,15 @@
+{
+  "apiVersion": "v1",
+  "kind": "APIGroup",
+  "name": "activation.k8s.io",
+  "preferredVersion": {
+    "groupVersion": "activation.k8s.io/v1alpha1",
+    "version": "v1alpha1"
+  },
+  "versions": [
+    {
+      "groupVersion": "activation.k8s.io/v1alpha1",
+      "version": "v1alpha1"
+    }
+  ]
+}

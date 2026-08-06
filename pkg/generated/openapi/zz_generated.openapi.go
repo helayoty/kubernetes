@@ -22,8 +22,9 @@ limitations under the License.
 package openapi
 
 import (
+	v1alpha1 "k8s.io/api/activation/v1alpha1"
 	v1 "k8s.io/api/admissionregistration/v1"
-	v1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
+	admissionregistrationv1alpha1 "k8s.io/api/admissionregistration/v1alpha1"
 	v1beta1 "k8s.io/api/admissionregistration/v1beta1"
 	v2 "k8s.io/api/apidiscovery/v2"
 	v2beta1 "k8s.io/api/apidiscovery/v2beta1"
@@ -128,6 +129,15 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
+		v1alpha1.ActivationPool{}.OpenAPIModelName():                                                                    schema_k8sio_api_activation_v1alpha1_ActivationPool(ref),
+		v1alpha1.ActivationPoolList{}.OpenAPIModelName():                                                                schema_k8sio_api_activation_v1alpha1_ActivationPoolList(ref),
+		v1alpha1.ActivationPoolSpec{}.OpenAPIModelName():                                                                schema_k8sio_api_activation_v1alpha1_ActivationPoolSpec(ref),
+		v1alpha1.ActivationPoolStatus{}.OpenAPIModelName():                                                              schema_k8sio_api_activation_v1alpha1_ActivationPoolStatus(ref),
+		v1alpha1.ActivationSpec{}.OpenAPIModelName():                                                                    schema_k8sio_api_activation_v1alpha1_ActivationSpec(ref),
+		v1alpha1.DurabilitySpec{}.OpenAPIModelName():                                                                    schema_k8sio_api_activation_v1alpha1_DurabilitySpec(ref),
+		v1alpha1.PoolSource{}.OpenAPIModelName():                                                                        schema_k8sio_api_activation_v1alpha1_PoolSource(ref),
+		v1alpha1.SupplySpec{}.OpenAPIModelName():                                                                        schema_k8sio_api_activation_v1alpha1_SupplySpec(ref),
+		v1alpha1.WarmSpec{}.OpenAPIModelName():                                                                          schema_k8sio_api_activation_v1alpha1_WarmSpec(ref),
 		v1.ApplyConfiguration{}.OpenAPIModelName():                                                                      schema_k8sio_api_admissionregistration_v1_ApplyConfiguration(ref),
 		v1.AuditAnnotation{}.OpenAPIModelName():                                                                         schema_k8sio_api_admissionregistration_v1_AuditAnnotation(ref),
 		v1.ExpressionWarning{}.OpenAPIModelName():                                                                       schema_k8sio_api_admissionregistration_v1_ExpressionWarning(ref),
@@ -164,32 +174,32 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		v1.Validation{}.OpenAPIModelName():                                                                              schema_k8sio_api_admissionregistration_v1_Validation(ref),
 		v1.Variable{}.OpenAPIModelName():                                                                                schema_k8sio_api_admissionregistration_v1_Variable(ref),
 		v1.WebhookClientConfig{}.OpenAPIModelName():                                                                     schema_k8sio_api_admissionregistration_v1_WebhookClientConfig(ref),
-		v1alpha1.ApplyConfiguration{}.OpenAPIModelName():                                                                schema_k8sio_api_admissionregistration_v1alpha1_ApplyConfiguration(ref),
-		v1alpha1.AuditAnnotation{}.OpenAPIModelName():                                                                   schema_k8sio_api_admissionregistration_v1alpha1_AuditAnnotation(ref),
-		v1alpha1.ExpressionWarning{}.OpenAPIModelName():                                                                 schema_k8sio_api_admissionregistration_v1alpha1_ExpressionWarning(ref),
-		v1alpha1.JSONPatch{}.OpenAPIModelName():                                                                         schema_k8sio_api_admissionregistration_v1alpha1_JSONPatch(ref),
-		v1alpha1.MatchCondition{}.OpenAPIModelName():                                                                    schema_k8sio_api_admissionregistration_v1alpha1_MatchCondition(ref),
-		v1alpha1.MatchResources{}.OpenAPIModelName():                                                                    schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref),
-		v1alpha1.MutatingAdmissionPolicy{}.OpenAPIModelName():                                                           schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicy(ref),
-		v1alpha1.MutatingAdmissionPolicyBinding{}.OpenAPIModelName():                                                    schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBinding(ref),
-		v1alpha1.MutatingAdmissionPolicyBindingList{}.OpenAPIModelName():                                                schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBindingList(ref),
-		v1alpha1.MutatingAdmissionPolicyBindingSpec{}.OpenAPIModelName():                                                schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBindingSpec(ref),
-		v1alpha1.MutatingAdmissionPolicyList{}.OpenAPIModelName():                                                       schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyList(ref),
-		v1alpha1.MutatingAdmissionPolicySpec{}.OpenAPIModelName():                                                       schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec(ref),
-		v1alpha1.Mutation{}.OpenAPIModelName():                                                                          schema_k8sio_api_admissionregistration_v1alpha1_Mutation(ref),
-		v1alpha1.NamedRuleWithOperations{}.OpenAPIModelName():                                                           schema_k8sio_api_admissionregistration_v1alpha1_NamedRuleWithOperations(ref),
-		v1alpha1.ParamKind{}.OpenAPIModelName():                                                                         schema_k8sio_api_admissionregistration_v1alpha1_ParamKind(ref),
-		v1alpha1.ParamRef{}.OpenAPIModelName():                                                                          schema_k8sio_api_admissionregistration_v1alpha1_ParamRef(ref),
-		v1alpha1.TypeChecking{}.OpenAPIModelName():                                                                      schema_k8sio_api_admissionregistration_v1alpha1_TypeChecking(ref),
-		v1alpha1.ValidatingAdmissionPolicy{}.OpenAPIModelName():                                                         schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(ref),
-		v1alpha1.ValidatingAdmissionPolicyBinding{}.OpenAPIModelName():                                                  schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBinding(ref),
-		v1alpha1.ValidatingAdmissionPolicyBindingList{}.OpenAPIModelName():                                              schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBindingList(ref),
-		v1alpha1.ValidatingAdmissionPolicyBindingSpec{}.OpenAPIModelName():                                              schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBindingSpec(ref),
-		v1alpha1.ValidatingAdmissionPolicyList{}.OpenAPIModelName():                                                     schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyList(ref),
-		v1alpha1.ValidatingAdmissionPolicySpec{}.OpenAPIModelName():                                                     schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySpec(ref),
-		v1alpha1.ValidatingAdmissionPolicyStatus{}.OpenAPIModelName():                                                   schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyStatus(ref),
-		v1alpha1.Validation{}.OpenAPIModelName():                                                                        schema_k8sio_api_admissionregistration_v1alpha1_Validation(ref),
-		v1alpha1.Variable{}.OpenAPIModelName():                                                                          schema_k8sio_api_admissionregistration_v1alpha1_Variable(ref),
+		admissionregistrationv1alpha1.ApplyConfiguration{}.OpenAPIModelName():                                           schema_k8sio_api_admissionregistration_v1alpha1_ApplyConfiguration(ref),
+		admissionregistrationv1alpha1.AuditAnnotation{}.OpenAPIModelName():                                              schema_k8sio_api_admissionregistration_v1alpha1_AuditAnnotation(ref),
+		admissionregistrationv1alpha1.ExpressionWarning{}.OpenAPIModelName():                                            schema_k8sio_api_admissionregistration_v1alpha1_ExpressionWarning(ref),
+		admissionregistrationv1alpha1.JSONPatch{}.OpenAPIModelName():                                                    schema_k8sio_api_admissionregistration_v1alpha1_JSONPatch(ref),
+		admissionregistrationv1alpha1.MatchCondition{}.OpenAPIModelName():                                               schema_k8sio_api_admissionregistration_v1alpha1_MatchCondition(ref),
+		admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName():                                               schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref),
+		admissionregistrationv1alpha1.MutatingAdmissionPolicy{}.OpenAPIModelName():                                      schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicy(ref),
+		admissionregistrationv1alpha1.MutatingAdmissionPolicyBinding{}.OpenAPIModelName():                               schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBinding(ref),
+		admissionregistrationv1alpha1.MutatingAdmissionPolicyBindingList{}.OpenAPIModelName():                           schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBindingList(ref),
+		admissionregistrationv1alpha1.MutatingAdmissionPolicyBindingSpec{}.OpenAPIModelName():                           schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBindingSpec(ref),
+		admissionregistrationv1alpha1.MutatingAdmissionPolicyList{}.OpenAPIModelName():                                  schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyList(ref),
+		admissionregistrationv1alpha1.MutatingAdmissionPolicySpec{}.OpenAPIModelName():                                  schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec(ref),
+		admissionregistrationv1alpha1.Mutation{}.OpenAPIModelName():                                                     schema_k8sio_api_admissionregistration_v1alpha1_Mutation(ref),
+		admissionregistrationv1alpha1.NamedRuleWithOperations{}.OpenAPIModelName():                                      schema_k8sio_api_admissionregistration_v1alpha1_NamedRuleWithOperations(ref),
+		admissionregistrationv1alpha1.ParamKind{}.OpenAPIModelName():                                                    schema_k8sio_api_admissionregistration_v1alpha1_ParamKind(ref),
+		admissionregistrationv1alpha1.ParamRef{}.OpenAPIModelName():                                                     schema_k8sio_api_admissionregistration_v1alpha1_ParamRef(ref),
+		admissionregistrationv1alpha1.TypeChecking{}.OpenAPIModelName():                                                 schema_k8sio_api_admissionregistration_v1alpha1_TypeChecking(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicy{}.OpenAPIModelName():                                    schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicyBinding{}.OpenAPIModelName():                             schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBinding(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingList{}.OpenAPIModelName():                         schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBindingList(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingSpec{}.OpenAPIModelName():                         schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBindingSpec(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicyList{}.OpenAPIModelName():                                schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyList(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicySpec{}.OpenAPIModelName():                                schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySpec(ref),
+		admissionregistrationv1alpha1.ValidatingAdmissionPolicyStatus{}.OpenAPIModelName():                              schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyStatus(ref),
+		admissionregistrationv1alpha1.Validation{}.OpenAPIModelName():                                                   schema_k8sio_api_admissionregistration_v1alpha1_Validation(ref),
+		admissionregistrationv1alpha1.Variable{}.OpenAPIModelName():                                                     schema_k8sio_api_admissionregistration_v1alpha1_Variable(ref),
 		v1beta1.ApplyConfiguration{}.OpenAPIModelName():                                                                 schema_k8sio_api_admissionregistration_v1beta1_ApplyConfiguration(ref),
 		v1beta1.AuditAnnotation{}.OpenAPIModelName():                                                                    schema_k8sio_api_admissionregistration_v1beta1_AuditAnnotation(ref),
 		v1beta1.ExpressionWarning{}.OpenAPIModelName():                                                                  schema_k8sio_api_admissionregistration_v1beta1_ExpressionWarning(ref),
@@ -1628,6 +1638,354 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		metricsv1beta1.NodeMetricsList{}.OpenAPIModelName():                                                             schema_pkg_apis_metrics_v1beta1_NodeMetricsList(ref),
 		metricsv1beta1.PodMetrics{}.OpenAPIModelName():                                                                  schema_pkg_apis_metrics_v1beta1_PodMetrics(ref),
 		metricsv1beta1.PodMetricsList{}.OpenAPIModelName():                                                              schema_pkg_apis_metrics_v1beta1_PodMetricsList(ref),
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_ActivationPool(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ActivationPool declares warm capacity for a workload template and how that pool replenishes. Routers bind ready capacity from a pool via the Activation gRPC contract (k8s.io/activation); this object is the control-plane declaration of the pool, not the bind path itself.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata",
+							Default:     map[string]interface{}{},
+							Ref:         ref(metav1.ObjectMeta{}.OpenAPIModelName()),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired warm pool.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(v1alpha1.ActivationPoolSpec{}.OpenAPIModelName()),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status is the most recently observed status of the pool.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(v1alpha1.ActivationPoolStatus{}.OpenAPIModelName()),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			v1alpha1.ActivationPoolSpec{}.OpenAPIModelName(), v1alpha1.ActivationPoolStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_ActivationPoolList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ActivationPoolList is a collection of ActivationPool objects.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(metav1.ListMeta{}.OpenAPIModelName()),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of ActivationPool objects.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref(v1alpha1.ActivationPool{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			v1alpha1.ActivationPool{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_ActivationPoolSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ActivationPoolSpec is the specification of an ActivationPool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"templateRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "TemplateRef references the PodTemplate used for capacity pods in this pool. The referenced object must be in the same namespace as the pool.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(corev1.TypedLocalObjectReference{}.OpenAPIModelName()),
+						},
+					},
+					"warm": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Warm configures how many restore-ready / idle sandboxes to hold.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(v1alpha1.WarmSpec{}.OpenAPIModelName()),
+						},
+					},
+					"source": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Source optionally identifies a checkpoint used to top up the pool (KEP-5823). Ignored for Phase 0 degraded-mode (idle pod) pools.",
+							Ref:         ref(v1alpha1.PoolSource{}.OpenAPIModelName()),
+						},
+					},
+					"activation": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Activation configures bind deadlines and demand coalescing.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(v1alpha1.ActivationSpec{}.OpenAPIModelName()),
+						},
+					},
+					"durability": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Durability declares which durability tiers this pool can satisfy. Activate binds only when the request's required tier is offered here.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(v1alpha1.DurabilitySpec{}.OpenAPIModelName()),
+						},
+					},
+					"supply": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Supply configures how the pool asks for replenishment capacity.",
+							Default:     map[string]interface{}{},
+							Ref:         ref(v1alpha1.SupplySpec{}.OpenAPIModelName()),
+						},
+					},
+					"endpointPort": {
+						SchemaProps: spec.SchemaProps{
+							Description: "EndpointPort is the port published in Bound.endpoints for capacity pods of this pool. PoC field until endpoints carry richer addressing.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"priorityClassName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "PriorityClassName is applied to capacity pods created for this pool so idle warm capacity remains reclaimable. PoC field.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"templateRef", "warm"},
+			},
+		},
+		Dependencies: []string{
+			v1alpha1.ActivationSpec{}.OpenAPIModelName(), v1alpha1.DurabilitySpec{}.OpenAPIModelName(), v1alpha1.PoolSource{}.OpenAPIModelName(), v1alpha1.SupplySpec{}.OpenAPIModelName(), v1alpha1.WarmSpec{}.OpenAPIModelName(), corev1.TypedLocalObjectReference{}.OpenAPIModelName()},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_ActivationPoolStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ActivationPoolStatus is the status of an ActivationPool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"type",
+								},
+								"x-kubernetes-list-type":       "map",
+								"x-kubernetes-patch-merge-key": "type",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions represent the latest available observations of the pool.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref(metav1.Condition{}.OpenAPIModelName()),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			metav1.Condition{}.OpenAPIModelName()},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_ActivationSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ActivationSpec configures request-scoped bind behavior for the pool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"deadline": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Deadline is the bind budget before the caller must fall back. Defaults to 800ms when unset.",
+							Ref:         ref(metav1.Duration{}.OpenAPIModelName()),
+						},
+					},
+					"coalescing": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Coalescing is the window in which concurrent demand is batched into one refill operation. Defaults to 50ms when unset.",
+							Ref:         ref(metav1.Duration{}.OpenAPIModelName()),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			metav1.Duration{}.OpenAPIModelName()},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_DurabilitySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "DurabilitySpec lists durability tiers the pool's runtime offers.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"offered": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "atomic",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Offered is the set of durability tiers this pool can satisfy.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+										Enum:   []interface{}{"BEST_EFFORT_DURABLE", "SYNC_DURABLE_CREATE"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_PoolSource(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PoolSource identifies optional warm-state provenance for the pool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"checkpointRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CheckpointRef names a checkpoint artifact (KEP-5823) used for restore hits. Opaque string for Phase 0; restore path is Phase 2.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_SupplySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SupplySpec configures how the pool signals demand for replenishment.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"capacityRequestClass": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CapacityRequestClass is a WAS provisioning class hook. Ignored until CapacityRequest exists in-tree; Phase 0 demand is pending capacity pods.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"deviceClaimScope": {
+						SchemaProps: spec.SchemaProps{
+							Description: "DeviceClaimScope controls whether a ResourceClaim is held for the pool lifetime or reallocated per activation.\n\nPossible enum values:\n - `\"PerActivation\"` reallocates per activation (rejected for warm-hit budget reasons in the Phase 0 opening position).\n - `\"Pool\"` holds one claim for the pool's lifetime.",
+							Type:        []string{"string"},
+							Format:      "",
+							Enum:        []interface{}{"PerActivation", "Pool"},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_k8sio_api_activation_v1alpha1_WarmSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "WarmSpec configures the warm floor and ceiling for a pool.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"min": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Min is the number of warm sandboxes the refill controller should try to maintain. Must be >= 0.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"max": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Max is the upper bound on warm sandboxes. Must be >= Min.",
+							Default:     0,
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+				Required: []string{"min", "max"},
+			},
+		},
 	}
 }
 
@@ -3832,7 +4190,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref common.R
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.NamedRuleWithOperations{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.NamedRuleWithOperations{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3850,7 +4208,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref common.R
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.NamedRuleWithOperations{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.NamedRuleWithOperations{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -3873,7 +4231,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MatchResources(ref common.R
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.NamedRuleWithOperations{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.NamedRuleWithOperations{}.OpenAPIModelName(), metav1.LabelSelector{}.OpenAPIModelName()},
 	}
 }
 
@@ -3909,14 +4267,14 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicy(ref
 						SchemaProps: spec.SchemaProps{
 							Description: "spec defines the desired behavior of the MutatingAdmissionPolicy.",
 							Default:     map[string]interface{}{},
-							Ref:         ref(v1alpha1.MutatingAdmissionPolicySpec{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.MutatingAdmissionPolicySpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MutatingAdmissionPolicySpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MutatingAdmissionPolicySpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3952,14 +4310,14 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBind
 						SchemaProps: spec.SchemaProps{
 							Description: "spec defines the desired behavior of the MutatingAdmissionPolicyBinding.",
 							Default:     map[string]interface{}{},
-							Ref:         ref(v1alpha1.MutatingAdmissionPolicyBindingSpec{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.MutatingAdmissionPolicyBindingSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MutatingAdmissionPolicyBindingSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MutatingAdmissionPolicyBindingSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -3998,7 +4356,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBind
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.MutatingAdmissionPolicyBinding{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.MutatingAdmissionPolicyBinding{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4009,7 +4367,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBind
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MutatingAdmissionPolicyBinding{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MutatingAdmissionPolicyBinding{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4030,20 +4388,20 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyBind
 					"paramRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "paramRef specifies the parameter resource used to configure the admission control policy. It should point to a resource of the type specified in spec.ParamKind of the bound MutatingAdmissionPolicy. If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the MutatingAdmissionPolicy applied. If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.",
-							Ref:         ref(v1alpha1.ParamRef{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ParamRef{}.OpenAPIModelName()),
 						},
 					},
 					"matchResources": {
 						SchemaProps: spec.SchemaProps{
 							Description: "matchResources limits what resources match this binding and may be mutated by it. Note that if matchResources matches a resource, the resource must also match a policy's matchConstraints and matchConditions before the resource may be mutated. When matchResources is unset, it does not constrain resource matching, and only the policy's matchConstraints and matchConditions must match for the resource to be mutated. Additionally, matchResources.resourceRules are optional and do not constraint matching when unset. Note that this is differs from MutatingAdmissionPolicy matchConstraints, where resourceRules are required. The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched. '*' matches CREATE, UPDATE and CONNECT.",
-							Ref:         ref(v1alpha1.MatchResources{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MatchResources{}.OpenAPIModelName(), v1alpha1.ParamRef{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName(), admissionregistrationv1alpha1.ParamRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -4082,7 +4440,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyList
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.MutatingAdmissionPolicy{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.MutatingAdmissionPolicy{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4093,7 +4451,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicyList
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MutatingAdmissionPolicy{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MutatingAdmissionPolicy{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4107,13 +4465,13 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 					"paramKind": {
 						SchemaProps: spec.SchemaProps{
 							Description: "paramKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If paramKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in MutatingAdmissionPolicyBinding, the params variable will be null.",
-							Ref:         ref(v1alpha1.ParamKind{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ParamKind{}.OpenAPIModelName()),
 						},
 					},
 					"matchConstraints": {
 						SchemaProps: spec.SchemaProps{
 							Description: "matchConstraints specifies what resources this policy is designed to validate. The MutatingAdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API MutatingAdmissionPolicy cannot match MutatingAdmissionPolicy and MutatingAdmissionPolicyBinding. The CREATE, UPDATE and CONNECT operations are allowed.  The DELETE operation may not be matched. '*' matches CREATE, UPDATE and CONNECT. Required.",
-							Ref:         ref(v1alpha1.MatchResources{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName()),
 						},
 					},
 					"variables": {
@@ -4128,7 +4486,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.Variable{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.Variable{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4146,7 +4504,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.Mutation{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.Mutation{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4177,7 +4535,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.MatchCondition{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.MatchCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4195,7 +4553,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_MutatingAdmissionPolicySpec
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MatchCondition{}.OpenAPIModelName(), v1alpha1.MatchResources{}.OpenAPIModelName(), v1alpha1.Mutation{}.OpenAPIModelName(), v1alpha1.ParamKind{}.OpenAPIModelName(), v1alpha1.Variable{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MatchCondition{}.OpenAPIModelName(), admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName(), admissionregistrationv1alpha1.Mutation{}.OpenAPIModelName(), admissionregistrationv1alpha1.ParamKind{}.OpenAPIModelName(), admissionregistrationv1alpha1.Variable{}.OpenAPIModelName()},
 	}
 }
 
@@ -4218,13 +4576,13 @@ func schema_k8sio_api_admissionregistration_v1alpha1_Mutation(ref common.Referen
 					"applyConfiguration": {
 						SchemaProps: spec.SchemaProps{
 							Description: "applyConfiguration defines the desired configuration values of an object. The configuration is applied to the admission object using [structured merge diff](https://github.com/kubernetes-sigs/structured-merge-diff). A CEL expression is used to create apply configuration.",
-							Ref:         ref(v1alpha1.ApplyConfiguration{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ApplyConfiguration{}.OpenAPIModelName()),
 						},
 					},
 					"jsonPatch": {
 						SchemaProps: spec.SchemaProps{
 							Description: "jsonPatch defines a [JSON patch](https://jsonpatch.com/) operation to perform a mutation to the object. A CEL expression is used to create the JSON patch.",
-							Ref:         ref(v1alpha1.JSONPatch{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.JSONPatch{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -4232,7 +4590,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_Mutation(ref common.Referen
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.ApplyConfiguration{}.OpenAPIModelName(), v1alpha1.JSONPatch{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.ApplyConfiguration{}.OpenAPIModelName(), admissionregistrationv1alpha1.JSONPatch{}.OpenAPIModelName()},
 	}
 }
 
@@ -4457,7 +4815,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_TypeChecking(ref common.Ref
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.ExpressionWarning{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.ExpressionWarning{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4467,7 +4825,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_TypeChecking(ref common.Ref
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.ExpressionWarning{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.ExpressionWarning{}.OpenAPIModelName()},
 	}
 }
 
@@ -4503,21 +4861,21 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicy(r
 						SchemaProps: spec.SchemaProps{
 							Description: "spec defines the desired behavior of the ValidatingAdmissionPolicy.",
 							Default:     map[string]interface{}{},
-							Ref:         ref(v1alpha1.ValidatingAdmissionPolicySpec{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ValidatingAdmissionPolicySpec{}.OpenAPIModelName()),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Description: "status represents the current status of the ValidatingAdmissionPolicy, including warnings that are useful to determine if the policy behaves in the expected way. Populated by the system. Read-only.",
 							Default:     map[string]interface{}{},
-							Ref:         ref(v1alpha1.ValidatingAdmissionPolicyStatus{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ValidatingAdmissionPolicyStatus{}.OpenAPIModelName()),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.ValidatingAdmissionPolicySpec{}.OpenAPIModelName(), v1alpha1.ValidatingAdmissionPolicyStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.ValidatingAdmissionPolicySpec{}.OpenAPIModelName(), admissionregistrationv1alpha1.ValidatingAdmissionPolicyStatus{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4553,7 +4911,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 						SchemaProps: spec.SchemaProps{
 							Description: "spec defines the desired behavior of the ValidatingAdmissionPolicyBinding.",
 							Default:     map[string]interface{}{},
-							Ref:         ref(v1alpha1.ValidatingAdmissionPolicyBindingSpec{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingSpec{}.OpenAPIModelName()),
 						},
 					},
 				},
@@ -4561,7 +4919,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.ValidatingAdmissionPolicyBindingSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.ValidatingAdmissionPolicyBindingSpec{}.OpenAPIModelName(), metav1.ObjectMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4600,7 +4958,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.ValidatingAdmissionPolicyBinding{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.ValidatingAdmissionPolicyBinding{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4611,7 +4969,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.ValidatingAdmissionPolicyBinding{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.ValidatingAdmissionPolicyBinding{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4632,13 +4990,13 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 					"paramRef": {
 						SchemaProps: spec.SchemaProps{
 							Description: "paramRef specifies the parameter resource used to configure the admission control policy. It should point to a resource of the type specified in ParamKind of the bound ValidatingAdmissionPolicy. If the policy specifies a ParamKind and the resource referred to by ParamRef does not exist, this binding is considered mis-configured and the FailurePolicy of the ValidatingAdmissionPolicy applied. If the policy does not specify a ParamKind then this field is ignored, and the rules are evaluated without a param.",
-							Ref:         ref(v1alpha1.ParamRef{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ParamRef{}.OpenAPIModelName()),
 						},
 					},
 					"matchResources": {
 						SchemaProps: spec.SchemaProps{
 							Description: "matchResources declares what resources match this binding and will be validated by it. Note that this is intersected with the policy's matchConstraints, so only requests that are matched by the policy can be selected by this. If this is unset, all resources matched by the policy are validated by this binding When resourceRules is unset, it does not constrain resource matching. If a resource is matched by the other fields of this object, it will be validated. Note that this is differs from ValidatingAdmissionPolicy matchConstraints, where resourceRules are required.",
-							Ref:         ref(v1alpha1.MatchResources{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName()),
 						},
 					},
 					"validationActions": {
@@ -4666,7 +5024,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyBi
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.MatchResources{}.OpenAPIModelName(), v1alpha1.ParamRef{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName(), admissionregistrationv1alpha1.ParamRef{}.OpenAPIModelName()},
 	}
 }
 
@@ -4705,7 +5063,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyLi
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.ValidatingAdmissionPolicy{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.ValidatingAdmissionPolicy{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4716,7 +5074,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicyLi
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.ValidatingAdmissionPolicy{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.ValidatingAdmissionPolicy{}.OpenAPIModelName(), metav1.ListMeta{}.OpenAPIModelName()},
 	}
 }
 
@@ -4730,13 +5088,13 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 					"paramKind": {
 						SchemaProps: spec.SchemaProps{
 							Description: "paramKind specifies the kind of resources used to parameterize this policy. If absent, there are no parameters for this policy and the param CEL variable will not be provided to validation expressions. If ParamKind refers to a non-existent kind, this policy definition is mis-configured and the FailurePolicy is applied. If paramKind is specified but paramRef is unset in ValidatingAdmissionPolicyBinding, the params variable will be null.",
-							Ref:         ref(v1alpha1.ParamKind{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.ParamKind{}.OpenAPIModelName()),
 						},
 					},
 					"matchConstraints": {
 						SchemaProps: spec.SchemaProps{
 							Description: "matchConstraints specifies what resources this policy is designed to validate. The AdmissionPolicy cares about a request if it matches _all_ Constraints. However, in order to prevent clusters from being put into an unstable state that cannot be recovered from via the API ValidatingAdmissionPolicy cannot match ValidatingAdmissionPolicy and ValidatingAdmissionPolicyBinding. Required.",
-							Ref:         ref(v1alpha1.MatchResources{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName()),
 						},
 					},
 					"validations": {
@@ -4751,7 +5109,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.Validation{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.Validation{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4777,7 +5135,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.AuditAnnotation{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.AuditAnnotation{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4800,7 +5158,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.MatchCondition{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.MatchCondition{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4823,7 +5181,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Ref: ref(v1alpha1.Variable{}.OpenAPIModelName()),
+										Ref: ref(admissionregistrationv1alpha1.Variable{}.OpenAPIModelName()),
 									},
 								},
 							},
@@ -4833,7 +5191,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySp
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.AuditAnnotation{}.OpenAPIModelName(), v1alpha1.MatchCondition{}.OpenAPIModelName(), v1alpha1.MatchResources{}.OpenAPIModelName(), v1alpha1.ParamKind{}.OpenAPIModelName(), v1alpha1.Validation{}.OpenAPIModelName(), v1alpha1.Variable{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.AuditAnnotation{}.OpenAPIModelName(), admissionregistrationv1alpha1.MatchCondition{}.OpenAPIModelName(), admissionregistrationv1alpha1.MatchResources{}.OpenAPIModelName(), admissionregistrationv1alpha1.ParamKind{}.OpenAPIModelName(), admissionregistrationv1alpha1.Validation{}.OpenAPIModelName(), admissionregistrationv1alpha1.Variable{}.OpenAPIModelName()},
 	}
 }
 
@@ -4854,7 +5212,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySt
 					"typeChecking": {
 						SchemaProps: spec.SchemaProps{
 							Description: "typeChecking contains the results of type checking for each expression. Presence of this field indicates the completion of the type checking.",
-							Ref:         ref(v1alpha1.TypeChecking{}.OpenAPIModelName()),
+							Ref:         ref(admissionregistrationv1alpha1.TypeChecking{}.OpenAPIModelName()),
 						},
 					},
 					"conditions": {
@@ -4882,7 +5240,7 @@ func schema_k8sio_api_admissionregistration_v1alpha1_ValidatingAdmissionPolicySt
 			},
 		},
 		Dependencies: []string{
-			v1alpha1.TypeChecking{}.OpenAPIModelName(), metav1.Condition{}.OpenAPIModelName()},
+			admissionregistrationv1alpha1.TypeChecking{}.OpenAPIModelName(), metav1.Condition{}.OpenAPIModelName()},
 	}
 }
 

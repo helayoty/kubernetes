@@ -273,6 +273,20 @@ func buildControllerRoles() ([]rbacv1.ClusterRole, []rbacv1.ClusterRoleBinding) 
 		}
 	}
 
+	if utilfeature.DefaultFeatureGate.Enabled(features.ActivationPool) {
+		addControllerRole(&controllerRoles, &controllerRoleBindings, rbacv1.ClusterRole{
+			// Same name as in k8s.io/kubernetes/cmd/kube-controller-manager/names.
+			ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "activationpool-controller"},
+			Rules: []rbacv1.PolicyRule{
+				// Reconcile the declared warm pools and their templates.
+				rbacv1helpers.NewRule("get", "list", "watch").Groups(activationGroup).Resources("activationpools").RuleOrDie(),
+				rbacv1helpers.NewRule("get", "list", "watch").Groups(legacyGroup).Resources("podtemplates").RuleOrDie(),
+				// Maintain warm capacity pods (create/delete against warm.min/max).
+				rbacv1helpers.NewRule("get", "list", "watch", "create", "delete").Groups(legacyGroup).Resources("pods").RuleOrDie(),
+			},
+		})
+	}
+
 	addControllerRole(&controllerRoles, &controllerRoleBindings, rbacv1.ClusterRole{
 		ObjectMeta: metav1.ObjectMeta{Name: saRolePrefix + "generic-garbage-collector"},
 		Rules: []rbacv1.PolicyRule{

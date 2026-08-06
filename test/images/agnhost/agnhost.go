@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"k8s.io/component-base/cli"
+	activationsandbox "k8s.io/kubernetes/test/images/agnhost/activation-sandbox"
 	auditproxy "k8s.io/kubernetes/test/images/agnhost/audit-proxy"
 	"k8s.io/kubernetes/test/images/agnhost/connect"
 	crdconvwebhook "k8s.io/kubernetes/test/images/agnhost/crd-conversion-webhook"
@@ -66,6 +67,7 @@ func main() {
 		Version: Version,
 	}
 
+	rootCmd.AddCommand(activationsandbox.CmdActivationSandbox)
 	rootCmd.AddCommand(auditproxy.CmdAuditProxy)
 	rootCmd.AddCommand(connect.CmdConnect)
 	rootCmd.AddCommand(crdconvwebhook.CmdCrdConversionWebhook)

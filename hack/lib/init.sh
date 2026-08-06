@@ -65,6 +65,7 @@ admissionregistration.k8s.io/v1alpha1 \
 admissionregistration.k8s.io/v1beta1 \
 admission.k8s.io/v1 \
 admission.k8s.io/v1beta1 \
+activation.k8s.io/v1alpha1 \
 apps/v1 \
 apps/v1beta1 \
 apps/v1beta2 \

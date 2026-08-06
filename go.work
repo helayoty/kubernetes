@@ -6,6 +6,7 @@ godebug default=go1.26
 
 use (
 	.
+	./staging/src/k8s.io/activation
 	./staging/src/k8s.io/api
 	./staging/src/k8s.io/apiextensions-apiserver
 	./staging/src/k8s.io/apimachinery

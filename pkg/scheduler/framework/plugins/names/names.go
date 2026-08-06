@@ -17,6 +17,7 @@ limitations under the License.
 package names
 
 const (
+	ActivationPool                  = "ActivationPool"
 	PrioritySort                    = "PrioritySort"
 	DefaultBinder                   = "DefaultBinder"
 	DefaultPreemption               = "DefaultPreemption"
